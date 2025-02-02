@@ -39,7 +39,7 @@ fun AppNavHost(navController: NavHostController) {
         composable("register") { RegisterScreen(navController) }
         composable("profile") { ProfileScreen(navController) }
         composable("login") { LoginScreen(navController) }
-        composable("welcome") { WelcomeScreen(navController, "Raúl") }
+        composable("welcome") { WelcomeScreen(navController, "omar") }
     }
 }
 
