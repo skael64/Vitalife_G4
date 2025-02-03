@@ -2,13 +2,14 @@ package com.example.vitalife.ui.theme
 
 import androidx.compose.ui.graphics.Color
 
-val Purple80 = Color(0xFFD0BCFF)
-val PurpleGrey80 = Color(0xFFCCC2DC)
-val Pink80 = Color(0xFFEFB8C8)
+// Tonos de verde y celeste
+val Green80 = Color(0xFF4CAF50) // Verde brillante
+val GreenGrey80 = Color(0xFF80E27E) // Verde suave
+val LightGreen80 = Color(0xFFA5D6A7) // Verde pastel
 
-val Purple40 = Color(0xFF00BCD4)
-val PurpleGrey40 = Color(0xFF625b71)
-val Pink40 = Color(0xFF7D5260)
+val Green40 = Color(0xFF388E3C) // Verde más oscuro
+val GreenGrey40 = Color(0xFF66BB6A) // Verde más suave
+val LightGreen40 = Color(0xFF81C784) // Verde claro
 
-val LightPrimaryContainer = Color(0xFFF4FFF0)
-val LightOnPrimaryContainer = Color(0xFF000000)
+val LightPrimaryContainer = Color(0xFFE8F5E9) // Fondo claro (verde suave)
+val LightOnPrimaryContainer = Color(0xFF000000) // Texto oscuro sobre fondo verde

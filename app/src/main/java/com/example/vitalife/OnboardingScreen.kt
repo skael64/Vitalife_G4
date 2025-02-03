@@ -19,14 +19,14 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 
-import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.ButtonDefaults // Modificar boton independiente
 
 @Composable
 fun OnboardingScreen(navController: NavController) {
     // Fondo de la pantalla
     Surface(
-        modifier = Modifier.fillMaxSize(),
-        color = MaterialTheme.colorScheme.primaryContainer
+        modifier = Modifier.fillMaxSize()
+        // color = MaterialTheme.colorScheme.primaryContainer
     ) {
         Column(
             modifier = Modifier
@@ -40,7 +40,7 @@ fun OnboardingScreen(navController: NavController) {
                 painter = painterResource(id = R.drawable.onboarding_image),
                 contentDescription = "Onboarding Image",
                 modifier = Modifier
-                    .size(150.dp)
+                    .size(200.dp)
                     .padding(bottom = 32.dp),
                 contentScale = ContentScale.Crop
             )
@@ -57,12 +57,13 @@ fun OnboardingScreen(navController: NavController) {
 
             // Subtítulo
             Text(
-                text = "Gestiona tu salud con facilidad",
+                text = "Haz del ejercicio un hábito",
                 fontSize = 16.sp,
                 color = MaterialTheme.colorScheme.onPrimaryContainer
             )
 
-            Spacer(modifier = Modifier.height(32.dp))
+            // Espaciado
+            Spacer(modifier = Modifier.height(200.dp))
 
             // Botón estilizado
             Button(

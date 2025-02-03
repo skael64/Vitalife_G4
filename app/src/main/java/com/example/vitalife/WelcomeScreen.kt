@@ -18,7 +18,7 @@ fun WelcomeScreen(navController: NavController, userName: String) {
     ) {
         Text(text = "Bienvenido, $userName")
         Spacer(modifier = Modifier.height(16.dp))
-        Button(onClick = { /* Lógica para ir al inicio */ }) {
+        Button(onClick = { navController.navigate("splash") }) {
             Text(text = "Ir al Inicio")
         }
     }
