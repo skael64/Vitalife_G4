@@ -12,6 +12,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import com.example.vitalife.ui.theme.VitalifeTheme
+import com.example.vitalife.ui.screens.RegisterScreen
+
+
 
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
