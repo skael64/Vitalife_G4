@@ -1,7 +1,7 @@
 package com.example.vitalife.api
 
-import com.example.vitalife.model.RegisterRequest
 import com.example.vitalife.api.ApiResponse
+import com.example.vitalife.model.RegisterRequest
 import retrofit2.Call
 import retrofit2.http.Body
 import retrofit2.http.Headers

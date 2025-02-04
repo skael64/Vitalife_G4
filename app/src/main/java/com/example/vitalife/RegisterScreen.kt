@@ -18,10 +18,10 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.vitalife.api.RetrofitClient
 import com.example.vitalife.api.ApiResponse
+import com.example.vitalife.model.RegisterRequest
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
-import com.example.vitalife.model.RegisterRequest
 
 @Composable
 fun RegisterScreen(navController: NavController) {
@@ -29,6 +29,9 @@ fun RegisterScreen(navController: NavController) {
     var apellidos by remember { mutableStateOf("") }
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
+    var fechaNacimiento by remember { mutableStateOf("") }
+    var peso by remember { mutableStateOf("") }
+    var talla by remember { mutableStateOf("") }
     var acceptedTerms by remember { mutableStateOf(false) }
     val context = LocalContext.current
 
@@ -45,45 +48,16 @@ fun RegisterScreen(navController: NavController) {
         )
         Spacer(modifier = Modifier.height(16.dp))
 
-        // NOMBRE
-        OutlinedTextField(
-            value = nombres,
-            onValueChange = { nombres = it },
-            label = { Text("Nombres") },
-            modifier = Modifier.fillMaxWidth()
-        )
-        Spacer(modifier = Modifier.height(8.dp))
+        InputField(nombres, { nombres = it }, "Nombres")
+        InputField(apellidos, { apellidos = it }, "Apellidos")
+        InputField(email, { email = it }, "Correo Electrónico", KeyboardType.Email)
+        InputField(password, { password = it }, "Contraseña", KeyboardType.Password)
+        InputField(fechaNacimiento, { fechaNacimiento = it }, "Fecha de Nacimiento (YYYY-MM-DD)")
+        InputField(peso, { peso = it }, "Peso (kg)", KeyboardType.Number)
+        InputField(talla, { talla = it }, "Talla (m)", KeyboardType.Number)
 
-        // APELLIDO
-        OutlinedTextField(
-            value = apellidos,
-            onValueChange = { apellidos = it },
-            label = { Text("Apellidos") },
-            modifier = Modifier.fillMaxWidth()
-        )
-        Spacer(modifier = Modifier.height(8.dp))
-
-        // EMAIL
-        OutlinedTextField(
-            value = email,
-            onValueChange = { email = it },
-            label = { Text("Correo Electrónico") },
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email, imeAction = ImeAction.Next),
-            modifier = Modifier.fillMaxWidth()
-        )
-        Spacer(modifier = Modifier.height(8.dp))
-
-        // CONTRASEÑA
-        OutlinedTextField(
-            value = password,
-            onValueChange = { password = it },
-            label = { Text("Contraseña") },
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password, imeAction = ImeAction.Done),
-            modifier = Modifier.fillMaxWidth()
-        )
         Spacer(modifier = Modifier.height(16.dp))
 
-        // CHECKBOX
         Row(
             verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier.fillMaxWidth()
@@ -92,22 +66,25 @@ fun RegisterScreen(navController: NavController) {
                 checked = acceptedTerms,
                 onCheckedChange = { acceptedTerms = it }
             )
-            Text(text = "Al continuar aceptas nuestra política de privacidad y términos de uso")
+            Text(text = "Acepto los términos y condiciones")
         }
         Spacer(modifier = Modifier.height(16.dp))
 
-        // Botón de Registro
         Button(
             onClick = {
-                if (acceptedTerms) {
-                    registerUser(nombres, apellidos, email, password, navController, context)
+                if (nombres.isNotEmpty() && apellidos.isNotEmpty() && email.isNotEmpty() && password.isNotEmpty()) {
+                    if (acceptedTerms) {
+                        registerUser(nombres, apellidos, email, password, fechaNacimiento, peso, talla, navController, context)
+                    } else {
+                        Toast.makeText(context, "Debes aceptar los términos", Toast.LENGTH_SHORT).show()
+                    }
                 } else {
-                    Toast.makeText(context, "Debes aceptar los términos y condiciones", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(context, "Completa todos los campos", Toast.LENGTH_SHORT).show()
                 }
             },
             colors = ButtonDefaults.buttonColors(
-                containerColor = Color(0xFF4CAF50), // Verde claro
-                contentColor = Color.White // Color del texto
+                containerColor = Color(0xFF4CAF50),
+                contentColor = Color.White
             ),
             enabled = acceptedTerms,
             modifier = Modifier.fillMaxWidth()
@@ -124,8 +101,30 @@ fun RegisterScreen(navController: NavController) {
     }
 }
 
-fun registerUser(nombres: String, apellidos: String, email: String, password: String, navController: NavController, context: android.content.Context) {
-    val request = RegisterRequest(nombres, apellidos, email, password)
+// 📌 Componente de Entrada de Texto Reutilizable
+@Composable
+fun InputField(value: String, onValueChange: (String) -> Unit, label: String, keyboardType: KeyboardType = KeyboardType.Text) {
+    OutlinedTextField(
+        value = value,
+        onValueChange = onValueChange,
+        label = { Text(label) },
+        keyboardOptions = KeyboardOptions(keyboardType = keyboardType, imeAction = ImeAction.Next),
+        modifier = Modifier.fillMaxWidth(),
+        singleLine = true
+    )
+    Spacer(modifier = Modifier.height(8.dp))
+}
+
+// 📌 Función para Registrar Usuario con Retrofit
+fun registerUser(
+    nombres: String, apellidos: String, email: String, password: String,
+    fechaNacimiento: String?, peso: String?, talla: String?,
+    navController: NavController, context: android.content.Context
+) {
+    val pesoDouble = peso?.toDoubleOrNull()
+    val tallaDouble = talla?.toDoubleOrNull()
+    val request = RegisterRequest(nombres, apellidos, email, password, fechaNacimiento, pesoDouble, tallaDouble)
+
     val call = RetrofitClient.instance.registerUser(request)
 
     call.enqueue(object : Callback<ApiResponse> {
@@ -134,7 +133,7 @@ fun registerUser(nombres: String, apellidos: String, email: String, password: St
                 response.body()?.let {
                     Toast.makeText(context, it.message, Toast.LENGTH_LONG).show()
                     if (it.success) {
-                        navController.navigate("profile") // Mueve a la pantalla de perfil si se registra
+                        navController.navigate("profile")
                     }
                 }
             } else {
