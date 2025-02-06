@@ -41,9 +41,14 @@ fun AppNavHost(navController: NavHostController) {
         composable("onboarding") { OnboardingScreen(navController) }
         composable("register") { RegisterScreen(navController) }
         composable("login") { LoginScreen(navController) }
-        composable("welcome") { WelcomeScreen(navController, "omar") }
+        composable("welcome/{userName}") { backStackEntry ->
+            val userName = backStackEntry.arguments?.getString("userName") ?: "Usuario"
+            WelcomeScreen(navController, userName)
+        }
     }
 }
+
+
 
 @Preview(showBackground = true)
 @Composable
