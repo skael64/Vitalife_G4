@@ -12,7 +12,7 @@ interface ApiService {
     @POST("register.php")
     fun registerUser(@Body request: RegisterRequest): Call<ApiResponse>
 
-    // 📌 Endpoint para iniciar sesión
+    // Endpoint para iniciar sesión
     @Headers("Content-Type: application/json")
     @POST("login.php")
     fun loginUser(@Body request: LoginRequest): Call<LoginResponse>
