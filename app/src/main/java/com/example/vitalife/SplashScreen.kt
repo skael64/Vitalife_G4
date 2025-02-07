@@ -21,7 +21,7 @@ fun SplashScreen(navController: NavController) {
     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
         // Imagen superior
         Image(
-            painter = painterResource(id = R.drawable.splashscreen_image),
+            painter = painterResource(id = R.drawable.onboarding_image),
             contentDescription = "Onboarding Image",
             modifier = Modifier
                 .size(400.dp)
