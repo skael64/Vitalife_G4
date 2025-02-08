@@ -7,5 +7,7 @@ data class RegisterRequest(
     val password: String,
     val fecha_nacimiento: String?, // Puede ser null
     val peso: Double?,
-    val talla: Double?
+    val talla: Double?,
+    val genero: String,  // Nuevo campo
+    val nivel_actividad: String // Nuevo campo
 )

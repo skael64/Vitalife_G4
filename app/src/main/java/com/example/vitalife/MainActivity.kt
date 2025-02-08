@@ -3,24 +3,13 @@ package com.example.vitalife
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.activity.enableEdgeToEdge
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-
 import androidx.compose.ui.tooling.preview.Preview
 import com.example.vitalife.ui.theme.VitalifeTheme
-import com.example.vitalife.ui.screens.RegisterScreen
-
-
-
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -41,19 +30,14 @@ fun AppNavHost(navController: NavHostController) {
         composable("onboarding") { OnboardingScreen(navController) }
         composable("register") { RegisterScreen(navController) }
         composable("login") { LoginScreen(navController) }
-        composable("welcome/{userName}") { backStackEntry ->
+        composable("welcome/{userName}/{userId}") { backStackEntry ->
             val userName = backStackEntry.arguments?.getString("userName") ?: "Usuario"
-            WelcomeScreen(navController, userName)
+            val userId = backStackEntry.arguments?.getString("userId")?.toIntOrNull()
+            WelcomeScreen(navController, userName, userId)
         }
-    }
-}
-
-
-
-@Preview(showBackground = true)
-@Composable
-fun DefaultPreview() {
-    VitalifeTheme {
-        SplashScreen(rememberNavController())
+        composable("profile/{userId}") { backStackEntry ->
+            val userId = backStackEntry.arguments?.getString("userId")?.toIntOrNull() ?: 0
+            ProfileScreen(navController, userId)
+        }
     }
 }
