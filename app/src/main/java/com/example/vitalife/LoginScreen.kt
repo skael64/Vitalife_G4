@@ -1,6 +1,5 @@
 package com.example.vitalife
 
-
 import android.widget.Toast
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -21,9 +20,9 @@ import com.example.vitalife.model.LoginResponse
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
-import com.example.vitalife.ui.theme.InputField
-import android.content.Context // 🔹 Para manejar el contexto en Toast
-import android.util.Log // 🔹 Para usar Log.d() y Log.e()
+import com.example.vitalife.ui.theme.components.InputField
+import android.content.Context
+import android.util.Log
 
 @Composable
 fun LoginScreen(navController: NavController) {
@@ -47,7 +46,7 @@ fun LoginScreen(navController: NavController) {
         Spacer(modifier = Modifier.height(16.dp))
 
         InputField(email, { email = it }, "Correo Electrónico", KeyboardType.Email)
-        InputField(password, { password = it }, "Contraseña", KeyboardType.Password)
+        InputField(password, { password = it }, "Contraseña", KeyboardType.Password, isPassword = true)
 
         Spacer(modifier = Modifier.height(16.dp))
 
@@ -77,6 +76,7 @@ fun LoginScreen(navController: NavController) {
     }
 }
 
+// 📌 Función para Iniciar Sesión con Retrofit
 fun loginUser(email: String, password: String, navController: NavController, context: Context) {
     val request = LoginRequest(email, password)
     val call = RetrofitClient.instance.loginUser(request)
@@ -90,8 +90,14 @@ fun loginUser(email: String, password: String, navController: NavController, con
                     Toast.makeText(context, loginResponse.message, Toast.LENGTH_LONG).show()
 
                     if (loginResponse.success) {
-                        val fullName = loginResponse.fullName ?: "Usuario"
-                        navController.navigate("welcome/$fullName") { // 🔹 Enviar nombre a la pantalla
+                        // ✅ Asegurar que obtenemos correctamente el nombre del usuario
+                        val nombres = loginResponse.nombres ?: "Usuario"
+                        val apellidos = loginResponse.apellidos ?: ""
+                        val fullName = "$nombres $apellidos".trim()
+                        val userId = loginResponse.userId ?: 0
+
+                        // ✅ Navegación corregida a WelcomeScreen con nombre e ID del usuario
+                        navController.navigate("welcome/$fullName/$userId") {
                             popUpTo("login") { inclusive = true }
                         }
                     }

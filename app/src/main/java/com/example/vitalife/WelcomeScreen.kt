@@ -10,15 +10,22 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 
 @Composable
-fun WelcomeScreen(navController: NavController, userName: String?) {
+fun WelcomeScreen(navController: NavController, userName: String?, userId: Int?) {
     Column(
         modifier = Modifier.fillMaxSize(),
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Text(text = "Bienvenido, ${userName ?: "Usuario"}") // 🔹 Mostrar el nombre correctamente
+        Text(text = "Bienvenido, ${userName ?: "Usuario"}")
         Spacer(modifier = Modifier.height(16.dp))
-        Button(onClick = { navController.navigate("splash") }) {
+
+        Button(onClick = {
+            if (userId != null) {
+                navController.navigate("profile/$userId")
+            } else {
+                navController.navigate("profile/0")
+            }
+        }) {
             Text(text = "Ir al Inicio")
         }
     }
