@@ -29,7 +29,8 @@ fun ProfileScreen(navController: NavController, userId: Int) {
     var isLoading by remember { mutableStateOf(true) }
 
     LaunchedEffect(userId) {
-        Log.d("ProfileDebug", "Obteniendo perfil para userId: $userId")
+        Log.d("ProfileDebug", "Obteniendo perfil para userId: $userId") // ✅ LOG para verificar ID
+
         fetchUserProfile(userId) { profile ->
             userProfile = profile
             isLoading = false
@@ -51,11 +52,12 @@ fun ProfileScreen(navController: NavController, userId: Int) {
             else -> {
                 val user = userProfile!!
 
+                Log.d("ProfileDebug", "Usuario cargado: ${user.nombres} ${user.apellidos}") // ✅ LOG de datos
+
                 Column(
                     modifier = Modifier.fillMaxSize().padding(16.dp),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    // Botón de regresar
                     Row(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.Start
@@ -67,21 +69,20 @@ fun ProfileScreen(navController: NavController, userId: Int) {
 
                     Spacer(modifier = Modifier.height(16.dp))
 
-                    // Nombre del usuario
                     Text(
                         text = "${user.nombres ?: "Usuario"} ${user.apellidos ?: "No registrado"}",
                         fontSize = 22.sp,
                         fontWeight = FontWeight.Bold
                     )
                     Text(
-                        text = user.nivel_actividad ?: "No especificado",
+                        text = user.nivelActividad ?: "No especificado",
                         fontSize = 16.sp,
                         color = Color.DarkGray
                     )
 
+
                     Spacer(modifier = Modifier.height(16.dp))
 
-                    // Información clave (Talla, Peso, Edad)
                     Row(horizontalArrangement = Arrangement.SpaceAround, modifier = Modifier.fillMaxWidth()) {
                         InfoCard("Talla", "${user.talla ?: "No registrada"} cm")
                         InfoCard("Peso", "${user.peso ?: "No registrado"} kg")
@@ -92,6 +93,7 @@ fun ProfileScreen(navController: NavController, userId: Int) {
         }
     }
 }
+
 
 // 📌 Tarjeta de información clave (Talla, Peso, Edad)
 @Composable
@@ -136,23 +138,47 @@ fun SectionCard(title: String, items: List<String>) {
 fun fetchUserProfile(userId: Int, onResult: (UserProfile?) -> Unit) {
     val call = RetrofitClient.instance.getUserProfile(userId)
 
-    call.enqueue(object : Callback<UserProfile> {
-        override fun onResponse(call: Call<UserProfile>, response: Response<UserProfile>) {
-            Log.d("ProfileDebug", "Código HTTP: ${response.code()}") // 📌 Ver código de respuesta
+    call.enqueue(object : Callback<Map<String, Any>> {
+        override fun onResponse(call: Call<Map<String, Any>>, response: Response<Map<String, Any>>) {
+            Log.d("ProfileDebug", "Código HTTP: ${response.code()}")
+            Log.d("ProfileDebug", "Cuerpo crudo de la respuesta: ${response.body()}")
 
             if (response.isSuccessful) {
-                val userProfile = response.body()
-                Log.d("ProfileDebug", "JSON recibido: ${response.body()}") // 🛠️ Nuevo Log con JSON
-                onResult(userProfile)
+                val responseBody = response.body()
+                if (responseBody != null && responseBody["success"] == true) {
+                    val userData = responseBody["user"] as? Map<String, Any>
+
+                    if (userData != null) {
+                        val userProfile = UserProfile(
+                            nombres = userData["nombres"] as? String,
+                            apellidos = userData["apellidos"] as? String,
+                            email = userData["email"] as? String,
+                            fechaNacimiento = userData["fecha_nacimiento"] as? String,
+                            peso = userData["peso"]?.toString(),
+                            talla = userData["talla"]?.toString(),
+                            genero = userData["genero"] as? String,
+                            nivelActividad = userData["nivel_actividad"] as? String,
+                            edad = (userData["edad"] as? Number)?.toInt()
+                        )
+                        Log.d("ProfileDebug", "Usuario cargado correctamente: $userProfile")
+                        onResult(userProfile)
+                    } else {
+                        Log.e("ProfileError", "El campo 'user' es nulo o incorrecto")
+                        onResult(null)
+                    }
+                } else {
+                    Log.e("ProfileError", "La respuesta no indica éxito")
+                    onResult(null)
+                }
             } else {
                 val errorBody = response.errorBody()?.string()
-                Log.e("ProfileError", "Error al obtener perfil: $errorBody") // 📌 Ver error
+                Log.e("ProfileError", "Error en la respuesta: $errorBody")
                 onResult(null)
             }
         }
 
-        override fun onFailure(call: Call<UserProfile>, t: Throwable) {
-            Log.e("ProfileError", "Error de conexión: ${t.message}") // 📌 Ver error de conexión
+        override fun onFailure(call: Call<Map<String, Any>>, t: Throwable) {
+            Log.e("ProfileError", "Error de conexión: ${t.message}")
             onResult(null)
         }
     })

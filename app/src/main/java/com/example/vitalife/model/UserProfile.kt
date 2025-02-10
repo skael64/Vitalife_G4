@@ -1,13 +1,14 @@
 package com.example.vitalife.model
+import com.google.gson.annotations.SerializedName
 
 data class UserProfile(
-    val nombres: String?,
-    val apellidos: String?,
-    val email: String?,
-    val fecha_nacimiento: String?,
-    val peso: String?,
-    val talla: String?,
-    val genero: String?,
-    val nivel_actividad: String?,
-    val edad: Int? // Edad debe ser Int
+    @SerializedName("nombres") val nombres: String?,
+    @SerializedName("apellidos") val apellidos: String?,
+    @SerializedName("email") val email: String?,
+    @SerializedName("fecha_nacimiento") val fechaNacimiento: String?,
+    @SerializedName("peso") val peso: String?,
+    @SerializedName("talla") val talla: String?,
+    @SerializedName("genero") val genero: String?,
+    @SerializedName("nivel_actividad") val nivelActividad: String?,
+    @SerializedName("edad") val edad: Int?
 )
