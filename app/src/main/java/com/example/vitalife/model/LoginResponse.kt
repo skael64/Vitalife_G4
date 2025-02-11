@@ -4,6 +4,6 @@ data class LoginResponse(
     val success: Boolean,
     val message: String,
     val userId: Int?,
-    val nombres: String?,  // 🔹 Agregamos nombres
-    val apellidos: String? // 🔹 Agregamos apellidos
+    val nombres: String?,   // ✅ Se asegura de coincidir con la API
+    val apellidos: String?  // ✅ Se asegura de coincidir con la API
 )
