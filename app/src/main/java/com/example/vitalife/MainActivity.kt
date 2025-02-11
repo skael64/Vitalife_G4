@@ -39,5 +39,6 @@ fun AppNavHost(navController: NavHostController) {
             val userId = backStackEntry.arguments?.getString("userId")?.toIntOrNull() ?: 0
             ProfileScreen(navController, userId)
         }
+        composable("sleepTracking") { SleepTrackerScreen() }
     }
 }

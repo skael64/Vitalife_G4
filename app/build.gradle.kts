@@ -27,7 +27,6 @@ android {
             )
         }
     }
-
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
@@ -44,6 +43,7 @@ android {
     composeOptions {
         kotlinCompilerExtensionVersion = "1.5.3"
     }
+
 }
 
 dependencies {
@@ -79,4 +79,9 @@ dependencies {
     androidTestImplementation(libs.androidx.ui.test.junit4)
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
+    // implementation para sleeptracker
+    implementation("androidx.activity:activity-compose:1.8.2")
+    implementation("androidx.compose.ui:ui:1.6.1")
+    implementation("androidx.compose.material3:material3:1.1.2")
+    implementation("com.github.PhilJay:MPAndroidChart:3.1.0")
 }
