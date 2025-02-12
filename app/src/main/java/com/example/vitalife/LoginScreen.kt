@@ -23,7 +23,7 @@ import retrofit2.Response
 import com.example.vitalife.ui.theme.components.InputField
 import android.content.Context
 import android.util.Log
-
+// Inicio del programa 1
 @Composable
 fun LoginScreen(navController: NavController) {
     var email by remember { mutableStateOf("") }
