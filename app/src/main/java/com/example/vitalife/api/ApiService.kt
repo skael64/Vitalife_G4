@@ -21,9 +21,6 @@ interface ApiService {
 
     // 📌 Obtener perfil del usuario por ID
     @GET("getUserProfile.php")
-    fun getUserProfile(@Query("userId") userId: Int): Call<Map<String, Any>>
-
-
-
+    fun getUserProfile(@Query("userId") userId: Int): Call<UserResponse> // 📌 Ahora usa UserResponse
 
 }
