@@ -1,5 +1,7 @@
 package com.example.vitalife
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -14,7 +16,10 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
 
+@RequiresApi(Build.VERSION_CODES.O) // ✅ Asegura que se usa API 26+
 @Composable
 fun ScheduleScreen(navController: NavController) {
     Column(
@@ -40,7 +45,7 @@ fun ScheduleScreen(navController: NavController) {
         }
         Spacer(modifier = Modifier.height(16.dp))
 
-        // 🔹 Calendario de días
+        // 🔹 Calendario con cambio de mes
         WeekCalendar()
 
         // 🔹 Lista de horarios disponibles
@@ -48,32 +53,45 @@ fun ScheduleScreen(navController: NavController) {
     }
 }
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun WeekCalendar() {
     val days = listOf("Lun", "Mar", "Mié", "Jue", "Vie", "Sáb", "Dom")
     var selectedDay by remember { mutableStateOf(4) } // Viernes por defecto
+    var currentMonth by remember { mutableStateOf(LocalDate.now()) }
+
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.SpaceBetween
+    ) {
+        IconButton(onClick = { currentMonth = currentMonth.minusMonths(1) }) {
+            Text(text = "<", fontSize = 20.sp)
+        }
+        Text(
+            text = currentMonth.format(DateTimeFormatter.ofPattern("MMMM yyyy")),
+            fontSize = 18.sp,
+            fontWeight = androidx.compose.ui.text.font.FontWeight.Bold
+        )
+        IconButton(onClick = { currentMonth = currentMonth.plusMonths(1) }) {
+            Text(text = ">", fontSize = 20.sp)
+        }
+    }
+    Spacer(modifier = Modifier.height(16.dp))
 
     Row(
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.SpaceAround
     ) {
         days.forEachIndexed { index, day ->
-            val backgroundModifier = if (index == selectedDay) {
-                Modifier.background(
-                    brush = Brush.horizontalGradient(listOf(Color(0xFF4CAF50), Color(0xFF2E7D32))),
-                    shape = RoundedCornerShape(10.dp)
-                )
-            } else {
-                Modifier.background(
-                    color = Color.LightGray,
-                    shape = RoundedCornerShape(10.dp)
-                )
-            }
-
             Box(
                 modifier = Modifier
                     .padding(4.dp)
-                    .then(backgroundModifier) // 🔥 Aplica la modificación según la condición
+                    .background(
+                        brush = if (index == selectedDay)
+                            Brush.horizontalGradient(listOf(Color(0xFF4CAF50), Color(0xFF2E7D32))) // ✅ Degradado correcto
+                        else Brush.horizontalGradient(listOf(Color.LightGray, Color.Gray)),
+                        shape = RoundedCornerShape(10.dp)
+                    )
                     .clickable { selectedDay = index }
                     .padding(vertical = 8.dp, horizontal = 12.dp),
                 contentAlignment = Alignment.Center
@@ -84,7 +102,6 @@ fun WeekCalendar() {
     }
     Spacer(modifier = Modifier.height(16.dp))
 }
-
 
 @Composable
 fun ScheduleList(navController: NavController) {
@@ -100,7 +117,7 @@ fun ScheduleList(navController: NavController) {
                     Box(
                         modifier = Modifier
                             .background(
-                                Brush.horizontalGradient(listOf(Color.Blue, Color.Green)), // ✅ Degradado corregido
+                                brush = Brush.horizontalGradient(listOf(Color(0xFF4CAF50), Color(0xFF2E7D32))),
                                 shape = RoundedCornerShape(10.dp)
                             )
                             .padding(horizontal = 12.dp, vertical = 4.dp)
@@ -119,6 +136,7 @@ fun ScheduleList(navController: NavController) {
     ) {
         FloatingActionButton(
             onClick = { navController.navigate("addSchedule") },
+            containerColor = Color(0xFF4CAF50),
             shape = CircleShape
         ) {
             Text("+", fontSize = 24.sp, color = Color.White)
