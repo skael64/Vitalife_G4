@@ -19,6 +19,8 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.vitalife.api.RetrofitClient
 import com.example.vitalife.model.UserProfile
+import com.example.vitalife.model.UserResponse
+
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -27,9 +29,10 @@ import retrofit2.Response
 fun ProfileScreen(navController: NavController, userId: Int) {
     var userProfile by remember { mutableStateOf<UserProfile?>(null) }
     var isLoading by remember { mutableStateOf(true) }
+    var notificationEnabled by remember { mutableStateOf(true) }
 
     LaunchedEffect(userId) {
-        Log.d("ProfileDebug", "Obteniendo perfil para userId: $userId") // ✅ LOG para verificar ID
+        Log.d("ProfileDebug", "Obteniendo perfil para userId: $userId")
 
         fetchUserProfile(userId) { profile ->
             userProfile = profile
@@ -52,12 +55,11 @@ fun ProfileScreen(navController: NavController, userId: Int) {
             else -> {
                 val user = userProfile!!
 
-                Log.d("ProfileDebug", "Usuario cargado: ${user.nombres} ${user.apellidos}") // ✅ LOG de datos
-
                 Column(
                     modifier = Modifier.fillMaxSize().padding(16.dp),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
+                    // 🔹 Botón de regresar
                     Row(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.Start
@@ -69,8 +71,9 @@ fun ProfileScreen(navController: NavController, userId: Int) {
 
                     Spacer(modifier = Modifier.height(16.dp))
 
+                    // 🔹 Datos del usuario
                     Text(
-                        text = "${user.nombres ?: "Usuario"} ${user.apellidos ?: "No registrado"}",
+                        text = "${user.nombres ?: "Usuario"} ${user.apellidos ?: ""}".trim(),
                         fontSize = 22.sp,
                         fontWeight = FontWeight.Bold
                     )
@@ -80,20 +83,59 @@ fun ProfileScreen(navController: NavController, userId: Int) {
                         color = Color.DarkGray
                     )
 
-
                     Spacer(modifier = Modifier.height(16.dp))
 
-                    Row(horizontalArrangement = Arrangement.SpaceAround, modifier = Modifier.fillMaxWidth()) {
+                    // 🔹 Información clave (Talla, Peso, Edad)
+                    Row(
+                        horizontalArrangement = Arrangement.SpaceAround,
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
                         InfoCard("Talla", "${user.talla ?: "No registrada"} cm")
                         InfoCard("Peso", "${user.peso ?: "No registrado"} kg")
                         InfoCard("Edad", "${user.edad ?: "N/A"} años")
                     }
+
+                    Spacer(modifier = Modifier.height(24.dp))
+
+                    // 🔹 Sección Cuenta
+                    // 🔹 Sección Cuenta
+                    SectionCard(
+                        title = "Cuenta",
+                        items = listOf("Datos Personales", "Logros", "Historial de Actividades", "Progreso de Entrenamiento"),
+                        navController = navController
+                    )
+
+                    // 🔹 Sección Otros
+                    SectionCard(
+                        title = "Otros",
+                        items = listOf("Contáctanos", "Política de privacidad", "Ajustes"),
+                        navController = navController
+                    )
+
+
+                    Spacer(modifier = Modifier.height(16.dp))
+
+                    // 🔹 Sección Notificación
+                    NotificationToggle(
+                        title = "Notificación emergente",
+                        checked = notificationEnabled,
+                        onCheckedChange = { notificationEnabled = it }
+                    )
+
+                    Spacer(modifier = Modifier.height(16.dp))
+
+                    // 🔹 Sección Otros
+                    SectionCard(
+                        title = "Otros",
+                        items = listOf("Contáctanos", "Política de privacidad", "Ajustes"),
+                        navController = navController
+                    )
+
                 }
             }
         }
     }
 }
-
 
 // 📌 Tarjeta de información clave (Talla, Peso, Edad)
 @Composable
@@ -112,7 +154,7 @@ fun InfoCard(title: String, value: String) {
 
 // 📌 Secciones con opciones
 @Composable
-fun SectionCard(title: String, items: List<String>) {
+fun SectionCard(title: String, items: List<String>, navController: NavController) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -127,10 +169,30 @@ fun SectionCard(title: String, items: List<String>) {
                 fontSize = 16.sp,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .clickable { /* Acción al hacer click */ }
+                    .clickable {
+                        when (item) {
+                            "Historial de Actividades" -> navController.navigate("workoutTracker")
+                        }
+                    }
                     .padding(vertical = 8.dp)
             )
         }
+    }
+}
+
+// 📌 Toggle de notificaciones
+@Composable
+fun NotificationToggle(title: String, checked: Boolean, onCheckedChange: (Boolean) -> Unit) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .background(Color(0xFF4CAF50), shape = RoundedCornerShape(16.dp))
+            .padding(16.dp),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Text(text = title, fontSize = 16.sp)
+        Switch(checked = checked, onCheckedChange = onCheckedChange)
     }
 }
 
@@ -138,38 +200,17 @@ fun SectionCard(title: String, items: List<String>) {
 fun fetchUserProfile(userId: Int, onResult: (UserProfile?) -> Unit) {
     val call = RetrofitClient.instance.getUserProfile(userId)
 
-    call.enqueue(object : Callback<Map<String, Any>> {
-        override fun onResponse(call: Call<Map<String, Any>>, response: Response<Map<String, Any>>) {
+    call.enqueue(object : Callback<UserResponse> {
+        override fun onResponse(call: Call<UserResponse>, response: Response<UserResponse>) {
             Log.d("ProfileDebug", "Código HTTP: ${response.code()}")
             Log.d("ProfileDebug", "Cuerpo crudo de la respuesta: ${response.body()}")
 
             if (response.isSuccessful) {
-                val responseBody = response.body()
-                if (responseBody != null && responseBody["success"] == true) {
-                    val userData = responseBody["user"] as? Map<String, Any>
+                val userResponse = response.body()
+                val userProfile = userResponse?.user // 📌 Extrae `user`
+                Log.d("ProfileDebug", "Usuario cargado correctamente: $userProfile")
 
-                    if (userData != null) {
-                        val userProfile = UserProfile(
-                            nombres = userData["nombres"] as? String,
-                            apellidos = userData["apellidos"] as? String,
-                            email = userData["email"] as? String,
-                            fechaNacimiento = userData["fecha_nacimiento"] as? String,
-                            peso = userData["peso"]?.toString(),
-                            talla = userData["talla"]?.toString(),
-                            genero = userData["genero"] as? String,
-                            nivelActividad = userData["nivel_actividad"] as? String,
-                            edad = (userData["edad"] as? Number)?.toInt()
-                        )
-                        Log.d("ProfileDebug", "Usuario cargado correctamente: $userProfile")
-                        onResult(userProfile)
-                    } else {
-                        Log.e("ProfileError", "El campo 'user' es nulo o incorrecto")
-                        onResult(null)
-                    }
-                } else {
-                    Log.e("ProfileError", "La respuesta no indica éxito")
-                    onResult(null)
-                }
+                onResult(userProfile)
             } else {
                 val errorBody = response.errorBody()?.string()
                 Log.e("ProfileError", "Error en la respuesta: $errorBody")
@@ -177,7 +218,7 @@ fun fetchUserProfile(userId: Int, onResult: (UserProfile?) -> Unit) {
             }
         }
 
-        override fun onFailure(call: Call<Map<String, Any>>, t: Throwable) {
+        override fun onFailure(call: Call<UserResponse>, t: Throwable) {
             Log.e("ProfileError", "Error de conexión: ${t.message}")
             onResult(null)
         }
