@@ -4,7 +4,6 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.tooling.preview.Preview
 import com.example.vitalife.ui.theme.VitalifeTheme
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
@@ -40,5 +39,9 @@ fun AppNavHost(navController: NavHostController) {
             ProfileScreen(navController, userId)
         }
         composable("sleepTracking") { SleepTrackerScreen() }
+        composable("workoutTracker") { WorkoutTrackerScreen(navController) }
+        composable("schedule") { ScheduleScreen(navController) }
+        composable("addSchedule") { AddScheduleScreen(navController) }
+
     }
 }

@@ -57,6 +57,7 @@ dependencies {
     implementation(libs.androidx.ui.graphics)
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
+    implementation("com.patrykandpatrick.vico:compose:1.7.0")
 
     // 📌 Se eliminó "foundation-text" y se corrigió la dependencia de Compose
     implementation("androidx.compose.foundation:foundation:1.5.2")
