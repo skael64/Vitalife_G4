@@ -67,9 +67,12 @@ dependencies {
     implementation("com.squareup.retrofit2:retrofit:2.9.0")
     implementation("com.squareup.retrofit2:converter-gson:2.9.0")
     implementation("com.google.code.gson:gson:2.8.9")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.6.4")
 
     // Navegación en Jetpack Compose
     implementation("androidx.navigation:navigation-compose:2.7.5")
+    implementation ("com.google.android.gms:play-services-fitness:21.1.0")
+    implementation ("com.google.android.gms:play-services-auth:20.7.0")
 
     // Testing
     testImplementation(libs.junit)
