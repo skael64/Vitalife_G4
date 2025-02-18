@@ -22,8 +22,9 @@ class MainActivity : ComponentActivity() {
 
         setContent {
             VitalifeTheme {
-                val navController = rememberNavController()
-                AppNavHost(navController)
+                SleepApp()
+                //val navController = rememberNavController()
+               // AppNavHost(navController)
             }
         }
     }
@@ -45,7 +46,7 @@ fun AppNavHost(navController: NavHostController) {
             val userId = backStackEntry.arguments?.getString("userId")?.toIntOrNull() ?: 0
             ProfileScreen(navController, userId)
         }
-        composable("sleepTracking") { SleepTrackerScreen() }
+        composable("sleepTracking") { SleepTrackerScreen(onCheckClick = {navController.navigate("schedule")}) }
         composable("workoutTracker") { WorkoutTrackerScreen(navController) }
         composable("schedule") { ScheduleScreen(navController) }
         composable("addSchedule") { AddScheduleScreen(navController) } // ✅ Nueva pantalla añadida

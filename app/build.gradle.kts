@@ -47,7 +47,7 @@ android {
 
 dependencies {
     // 📌 Jetpack Compose BOM (Mejor forma de manejar dependencias de Compose)
-    implementation(platform("androidx.compose:compose-bom:2023.10.00"))
+    implementation(platform("androidx.compose:compose-bom:2024.10.01"))
 
     // 📌 Android Core y Lifecycle
     implementation(libs.androidx.core.ktx)
@@ -79,7 +79,7 @@ dependencies {
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
-    androidTestImplementation(platform(libs.androidx.compose.bom))
+    androidTestImplementation(platform("androidx.compose:compose-bom:2024.04.01"))
     androidTestImplementation(libs.androidx.ui.test.junit4)
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
