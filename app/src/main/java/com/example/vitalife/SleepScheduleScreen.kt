@@ -33,14 +33,24 @@ fun SleepApp() {
         }
         composable("schedule") {
             SleepScheduleScreen(
-                onBackClick = { navController.navigateUp() }
+                onBackClick = { navController.navigateUp() },
+                onAddClick = { navController.navigate("add-alarm") }
+            )
+        }
+        composable("add-alarm") {
+            AddAlarmScreen(
+                onBackClick = { navController.navigateUp() },
+                onAddClick = {
+                    // Aquí podrías agregar lógica para guardar la alarma si tuvieras backend
+                    navController.navigateUp()
+                }
             )
         }
     }
 }
 
 @Composable
-fun SleepScheduleScreen(onBackClick: () -> Unit) {
+fun SleepScheduleScreen(onBackClick: () -> Unit, onAddClick: () -> Unit) {
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -180,7 +190,7 @@ fun SleepScheduleScreen(onBackClick: () -> Unit) {
             contentAlignment = Alignment.BottomEnd
         ) {
             FloatingActionButton(
-                onClick = { /* TODO */ },
+                onClick = onAddClick,
                 containerColor = Color(0xFF81C784),
                 shape = CircleShape
             ) {
