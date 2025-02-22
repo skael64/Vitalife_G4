@@ -9,11 +9,16 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
 
 @Composable
 fun WorkoutTrackerScreen(navController: NavController) {
@@ -37,7 +42,7 @@ fun WorkoutTrackerScreen(navController: NavController) {
             Text(
                 text = "Seguimiento del entrenamiento",
                 fontSize = 20.sp,
-                fontWeight = androidx.compose.ui.text.font.FontWeight.Bold
+                fontWeight = FontWeight.Bold
             )
             Spacer(modifier = Modifier.weight(1f))
         }
@@ -49,7 +54,7 @@ fun WorkoutTrackerScreen(navController: NavController) {
 
         // 🔹 Botón de horario de entrenamiento
         Button(
-            onClick = { navController.navigate("schedule") }, // 📌 Redirige a la pantalla de horarios
+            onClick = { navController.navigate("workoutSchedule") },
             colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFA8E6CF)),
             shape = RoundedCornerShape(12.dp),
             modifier = Modifier.fillMaxWidth().height(50.dp)
@@ -62,54 +67,72 @@ fun WorkoutTrackerScreen(navController: NavController) {
         Text(
             text = "¿Qué quieres entrenar?",
             fontSize = 20.sp,
-            fontWeight = androidx.compose.ui.text.font.FontWeight.Bold,
+            fontWeight = FontWeight.Bold,
             modifier = Modifier.align(Alignment.Start)
         )
         Spacer(modifier = Modifier.height(12.dp))
 
         // 🔹 Tarjetas de Ejercicios con animaciones y mejor diseño
-        ExerciseCard("🏋️ Entrenamiento completo", "11 Ejercicios | 32 mins")
-        ExerciseCard("🏃‍♂️ Ejercicios de piernas", "12 Ejercicios | 40 mins")
-        ExerciseCard("💪 Ejercicios de Abs", "14 Ejercicios | 20 mins")
+        WorkoutExerciseCard("🏋️ Entrenamiento completo", "11 Ejercicios | 32 mins")
+        WorkoutExerciseCard("🏃‍♂️ Ejercicios de piernas", "12 Ejercicios | 40 mins")
+        WorkoutExerciseCard("💪 Ejercicios de Abs", "14 Ejercicios | 20 mins")
     }
 }
 
 @Composable
-fun TrainingChart() {
-    Box(
+fun TrainingChart(progress: Float = 0.7f) {
+    Card(
         modifier = Modifier
             .fillMaxWidth()
-            .height(200.dp)
-            .background(
-                Brush.linearGradient(listOf(Color(0xFF81C784), Color(0xFF66BB6A))),
-                shape = RoundedCornerShape(12.dp)
-            ),
-        contentAlignment = Alignment.Center
+            .padding(vertical = 12.dp),
+        shape = RoundedCornerShape(16.dp),
+        colors = CardDefaults.cardColors(containerColor = Color(0xFFE8F5E9))
     ) {
-        Column(horizontalAlignment = Alignment.CenterHorizontally) {
-            Text(text = "📊 Progreso Semanal", color = Color.White, fontSize = 18.sp)
-            Spacer(modifier = Modifier.height(8.dp))
+        Column(
+            modifier = Modifier.padding(16.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Text(
+                text = "Progreso semanal de entrenamiento",
+                fontSize = 18.sp,
+                fontWeight = FontWeight.Bold
+            )
+            Spacer(modifier = Modifier.height(12.dp))
+
+            // Barra de progreso con degradado
             Box(
                 modifier = Modifier
-                    .fillMaxWidth(0.8f)
-                    .height(6.dp)
-                    .background(Color.White, shape = RoundedCornerShape(3.dp))
+                    .fillMaxWidth()
+                    .height(8.dp)
+                    .clip(RoundedCornerShape(4.dp))
+                    .background(Color(0xFFE0E0E0))
             ) {
                 Box(
                     modifier = Modifier
-                        .fillMaxWidth(0.7f) // Representa el 70% del progreso
-                        .height(6.dp)
-                        .background(Color.Green, shape = RoundedCornerShape(3.dp))
+                        .fillMaxWidth(progress) // Representa el porcentaje de progreso
+                        .height(8.dp)
+                        .background(
+                            Brush.horizontalGradient(
+                                listOf(Color(0xFF81C784), Color(0xFF4CAF50))
+                            ), shape = RoundedCornerShape(4.dp)
+                        )
                 )
             }
-            Spacer(modifier = Modifier.height(4.dp))
-            Text(text = "🔥 70% del objetivo semanal alcanzado", color = Color.White, fontSize = 14.sp)
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            Text(
+                text = "🔥 ${(progress * 100).toInt()}% del objetivo semanal alcanzado",
+                fontSize = 14.sp,
+                fontWeight = FontWeight.Medium,
+                color = Color(0xFF388E3C)
+            )
         }
     }
 }
 
 @Composable
-fun ExerciseCard(title: String, subtitle: String) {
+fun WorkoutExerciseCard(title: String, subtitle: String) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -135,9 +158,21 @@ fun ExerciseCard(title: String, subtitle: String) {
             }
             Spacer(modifier = Modifier.width(16.dp))
             Column {
-                Text(text = title, fontSize = 18.sp, fontWeight = androidx.compose.ui.text.font.FontWeight.Bold)
+                Text(text = title, fontSize = 18.sp, fontWeight = FontWeight.Bold)
                 Text(text = subtitle, fontSize = 14.sp, color = Color.Gray)
             }
         }
+    }
+}
+
+// 🔹 Navegación en WorkoutTrackerApp
+@Composable
+fun WorkoutTrackerApp() {
+    val navController = rememberNavController()
+
+    NavHost(navController = navController, startDestination = "workoutTracker") {
+        composable("workoutTracker") { WorkoutTrackerScreen(navController) }
+        composable("workoutSchedule") { WorkoutScheduleScreen(navController) }
+        composable("addSchedule") { AddScheduleScreen(navController) }
     }
 }

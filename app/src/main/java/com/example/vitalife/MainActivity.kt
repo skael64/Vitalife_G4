@@ -9,22 +9,14 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.vitalife.ui.theme.VitalifeTheme
-import java.time.LocalDate
-import java.time.format.DateTimeFormatter
-
-
-
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-
         setContent {
             VitalifeTheme {
-                SleepApp()
-                //val navController = rememberNavController()
-               // AppNavHost(navController)
+                WorkoutTrackerApp()
             }
         }
     }
@@ -46,9 +38,9 @@ fun AppNavHost(navController: NavHostController) {
             val userId = backStackEntry.arguments?.getString("userId")?.toIntOrNull() ?: 0
             ProfileScreen(navController, userId)
         }
-        composable("sleepTracking") { SleepTrackerScreen(onCheckClick = {navController.navigate("schedule")}) }
+        composable("sleepTracking") { SleepTrackerScreen(onCheckClick = { navController.navigate("schedule") }) }
         composable("workoutTracker") { WorkoutTrackerScreen(navController) }
-        composable("schedule") { ScheduleScreen(navController) }
-        composable("addSchedule") { AddScheduleScreen(navController) } // ✅ Nueva pantalla añadida
+        composable("workoutSchedule") { WorkoutScheduleScreen(navController) }
+        composable("addSchedule") { AddScheduleScreen(navController) }
     }
 }
