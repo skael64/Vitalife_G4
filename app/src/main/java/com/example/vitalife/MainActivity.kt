@@ -48,5 +48,7 @@ fun AppNavHost(navController: NavHostController) {
         composable("workoutTracker") { WorkoutTrackerScreen(navController) }
         composable("schedule") { ScheduleScreen(navController) }
         composable("addSchedule") { AddScheduleScreen(navController) } // ✅ Nueva pantalla añadida
+
+        
     }
 }
