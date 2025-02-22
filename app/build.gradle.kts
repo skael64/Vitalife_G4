@@ -73,7 +73,8 @@ dependencies {
     implementation("androidx.navigation:navigation-compose:2.7.5")
     implementation ("com.google.android.gms:play-services-fitness:21.1.0")
     implementation ("com.google.android.gms:play-services-auth:20.7.0")
-
+    implementation ("androidx.compose.material3:material3:1.2.0")
+    implementation ("androidx.compose.ui:ui-tooling:1.6.1")
     // Testing
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)

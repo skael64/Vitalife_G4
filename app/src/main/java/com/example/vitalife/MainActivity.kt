@@ -3,13 +3,13 @@ package com.example.vitalife
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.runtime.Composable
-import androidx.navigation.NavHostController
+import androidx.navigation.compose.rememberNavController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import androidx.navigation.compose.rememberNavController
-import com.example.vitalife.ui.theme.VitalifeTheme
-import com.example.vitalife.ui.screens.*
+import com.example.vitalife.ui.screens.GoogleFitAuthScreen
+import com.example.vitalife.ui.screens.HomeScreen
+import com.example.vitalife.ui.screens.NotificationsScreen
+import com.example.vitalife.ui.screens.ChatBotScreen
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
@@ -23,45 +23,20 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            VitalifeTheme {
-                val navController = rememberNavController()
-                AppNavHost(navController)
+            val navController = rememberNavController()
+            NavHost(navController = navController, startDestination = "home") {
+                composable("home") { HomeScreen(navController) }
+                composable("notifications") { NotificationsScreen() }
+                composable("auth") { GoogleFitAuthScreenWrapper(navController) }
+                composable("chatbot") { ChatBotScreen(navController) }
+
             }
         }
     }
 }
 
 @Composable
-fun AppNavHost(navController: NavHostController) {
-    NavHost(navController = navController, startDestination = "splash") {
-        composable("splash") { SplashScreen(navController) }
-        composable("onboarding") { OnboardingScreen(navController) }
-        composable("register") { RegisterScreen(navController) }
-        composable("login") { LoginScreen(navController) }
-        composable("welcome/{userName}/{userId}") { backStackEntry ->
-            val userName = backStackEntry.arguments?.getString("userName") ?: "Usuario"
-            val userId = backStackEntry.arguments?.getString("userId")?.toIntOrNull()
-            WelcomeScreen(navController, userName, userId)
-        }
-        composable("profile/{userId}") { backStackEntry ->
-            val userId = backStackEntry.arguments?.getString("userId")?.toIntOrNull() ?: 0
-            ProfileScreen(navController, userId)
-        }
-        composable("sleepTracking") { SleepTrackerScreen(onCheckClick = { navController.navigate("schedule") }) }
-        composable("workoutTracker") { WorkoutTrackerScreen(navController) }
-        composable("schedule") { ScheduleScreen(navController) }
-        composable("addSchedule") { AddScheduleScreen(navController) }
-
-        // Agregadas desde la rama Leonardo
-        composable("home") { HomeScreen(navController) }
-        composable("notifications") { NotificationsScreen() }
-        composable("auth") { GoogleFitAuthScreenWrapper(navController) }
-        composable("chatbot") { ChatBotScreen(navController) }
-    }
-}
-
-@Composable
-fun GoogleFitAuthScreenWrapper(navController: NavHostController) {
+fun GoogleFitAuthScreenWrapper(navController: androidx.navigation.NavController) {
     var account by remember { mutableStateOf<GoogleSignInAccount?>(null) }
     val context = LocalContext.current
 
