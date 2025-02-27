@@ -16,7 +16,10 @@ class MainActivity : ComponentActivity() {
 
         setContent {
             VitalifeTheme {
-                WorkoutTrackerApp()
+                //SleepApp()
+                val navController = rememberNavController()
+                AppNavHost(navController = navController)
+                //WorkoutTrackerApp()
             }
         }
     }

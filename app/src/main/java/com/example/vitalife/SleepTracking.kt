@@ -5,6 +5,8 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -39,7 +41,7 @@ fun SleepTrackerScreen(onCheckClick: () -> Unit) {
         Spacer(modifier = Modifier.height(24.dp))
         GradientSleepInfoCard()
         Spacer(modifier = Modifier.height(16.dp))
-        DailySleepScheduleCard(onCheckClick = onCheckClick)  // <- Aquí pasamos el onCheckClick
+        DailySleepScheduleCard(onCheckClick = onCheckClick)
         Spacer(modifier = Modifier.height(24.dp))
         TodaySchedule()
     }
@@ -220,6 +222,11 @@ fun ScheduleItem(
     time: String,
     remainingTime: String
 ) {
+    var isEnabled by remember { mutableStateOf(true) }
+    var showMenu by remember { mutableStateOf(false) }
+    var showDialog by remember { mutableStateOf(false) }
+    var dialogType by remember { mutableStateOf("") }
+
     Card(
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(16.dp),
@@ -237,25 +244,119 @@ fun ScheduleItem(
             Column(modifier = Modifier.weight(1f)) {
                 Text(
                     text = "$title, $time",
-                    fontWeight = FontWeight.Medium
+                    fontWeight = FontWeight.Medium,
+                    color = if (isEnabled) Color.Black else Color.Gray
                 )
                 Text(
                     text = remainingTime,
                     fontSize = 14.sp,
-                    color = Color.Gray
+                    color = if (isEnabled) Color.Gray else Color.LightGray
                 )
             }
-            IconButton(onClick = {}) {
-                Icon(Icons.Default.MoreVert, contentDescription = "More")
+            Box {
+                IconButton(onClick = { showMenu = true }) {
+                    Icon(
+                        Icons.Default.MoreVert,
+                        contentDescription = "More",
+                        tint = if (isEnabled) Color.DarkGray else Color.Gray
+                    )
+                }
+
+                DropdownMenu(
+                    expanded = showMenu,
+                    onDismissRequest = { showMenu = false }
+                ) {
+                    DropdownMenuItem(
+                        text = {
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                Icon(
+                                    Icons.Default.Edit,
+                                    contentDescription = "Edit",
+                                    modifier = Modifier.padding(end = 8.dp)
+                                )
+                                Text("Editar")
+                            }
+                        },
+                        onClick = {
+                            showDialog = true
+                            dialogType = "edit"
+                            showMenu = false
+                        }
+                    )
+                    DropdownMenuItem(
+                        text = {
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                Icon(
+                                    Icons.Default.Delete,
+                                    contentDescription = "Delete",
+                                    modifier = Modifier.padding(end = 8.dp)
+                                )
+                                Text("Eliminar")
+                            }
+                        },
+                        onClick = {
+                            showDialog = true
+                            dialogType = "delete"
+                            showMenu = false
+                        }
+                    )
+                }
             }
+
             Switch(
-                checked = true,
-                onCheckedChange = {},
+                checked = isEnabled,
+                onCheckedChange = { isEnabled = it },
                 colors = SwitchDefaults.colors(
                     checkedThumbColor = Color.White,
-                    checkedTrackColor = Color(0xFF81C784)
+                    checkedTrackColor = Color(0xFF81C784),
+                    uncheckedThumbColor = Color.White,
+                    uncheckedTrackColor = Color.LightGray
                 )
             )
         }
+    }
+
+    // Dialog for Edit
+    if (showDialog && dialogType == "edit") {
+        AlertDialog(
+            onDismissRequest = { showDialog = false },
+            title = { Text("Editar $title") },
+            text = { Text("Aquí iría un formulario para editar la hora de $title. Esta es una simulación frontend.") },
+            confirmButton = {
+                Button(
+                    onClick = { showDialog = false },
+                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF81C784))
+                ) {
+                    Text("Guardar")
+                }
+            },
+            dismissButton = {
+                OutlinedButton(onClick = { showDialog = false }) {
+                    Text("Cancelar")
+                }
+            }
+        )
+    }
+
+    // Dialog for Delete
+    if (showDialog && dialogType == "delete") {
+        AlertDialog(
+            onDismissRequest = { showDialog = false },
+            title = { Text("Eliminar $title") },
+            text = { Text("¿Estás seguro de que deseas eliminar esta programación? Esta acción no se puede deshacer.") },
+            confirmButton = {
+                Button(
+                    onClick = { showDialog = false },
+                    colors = ButtonDefaults.buttonColors(containerColor = Color.Red)
+                ) {
+                    Text("Eliminar", color = Color.White)
+                }
+            },
+            dismissButton = {
+                OutlinedButton(onClick = { showDialog = false }) {
+                    Text("Cancelar")
+                }
+            }
+        )
     }
 }
