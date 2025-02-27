@@ -1,5 +1,6 @@
 package com.example.vitalife
 
+import android.os.Looper
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
@@ -26,11 +27,11 @@ fun SplashScreen(navController: NavController) {
             contentScale = ContentScale.Crop
         )
     }
-    // Simula un retraso y navega automáticamente
-    android.os.Handler().postDelayed({
+    android.os.Handler(Looper.getMainLooper()).postDelayed({
         navController.navigate("onboarding") {
             popUpTo("splash") { inclusive = true }
         }
     }, 2000)
+
 }
 
