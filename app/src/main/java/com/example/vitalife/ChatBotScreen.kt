@@ -22,21 +22,20 @@ import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.launch
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.launch
+import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.rememberCoroutineScope
 
-// Añade esto fuera del composable
+// Data class para los mensajes
 data class Message(val text: String, val isUser: Boolean)
 
 @Composable
 fun ChatBotScreen(navController: NavController) {
     val messages = remember { mutableStateListOf<Message>() }
+    val userInput = remember { mutableStateOf("") }
     val coroutineScope = rememberCoroutineScope()
 
     Column(modifier = Modifier.fillMaxSize()) {
-        // Nueva cabecera con botón de regreso
+        // Cabecera
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -60,7 +59,7 @@ fun ChatBotScreen(navController: NavController) {
             )
         }
 
-        // Historial del chat (mensajes)
+        // Historial de mensajes
         LazyColumn(
             modifier = Modifier
                 .weight(1f)
@@ -72,6 +71,40 @@ fun ChatBotScreen(navController: NavController) {
             }
         }
 
+        // Campo de entrada de texto
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            TextField(
+                value = userInput.value,
+                onValueChange = { userInput.value = it },
+                modifier = Modifier
+                    .weight(1f)
+                    .padding(end = 8.dp),
+                placeholder = { Text("Escribe tu pregunta...") }
+            )
+
+            Button(
+                onClick = {
+                    if (userInput.value.isNotBlank()) {
+                        val question = userInput.value
+                        messages.add(Message(question, true))
+                        userInput.value = ""
+
+                        coroutineScope.launch {
+                            val answer = generateAnswer(question)
+                            messages.add(Message(answer, false))
+                        }
+                    }
+                }
+            ) {
+                Text("Enviar")
+            }
+        }
+
         // Sección de preguntas rápidas
         Column(
             modifier = Modifier
@@ -79,52 +112,26 @@ fun ChatBotScreen(navController: NavController) {
                 .verticalScroll(rememberScrollState())
         ) {
             Section(
-                title = "Preguntas frecuentes",
+                title = "Preguntas rápidas",
                 options = listOf(
-                    "¿Cuál es el mejor momento para entrenar?",
-                    "¿Qué ejercicios puedo hacer hoy?",
-                    "¿Cuánto tiempo debo descansar entre series?",
-                    "¿Es necesario hacer cardio todos los días?"
+                    "Ejercicios para brazos",
+                    "Masajes para dolor de cuello",
+                    "Rutina de calentamiento",
+                    "Ejercicios abdominales",
+                    "Estiramientos post-entreno"
                 ),
                 onOptionClick = { question ->
                     messages.add(Message(question, true))
                     coroutineScope.launch {
-                        val answer = when (question) {
-                            "¿Cuál es el mejor momento para entrenar?" -> "El mejor momento es cuando tengas más energía. Muchos prefieren mañanas para activar el metabolismo."
-                            "¿Qué ejercicios puedo hacer hoy?" -> "Sugiero:\n- Sentadillas 3x12\n- Flexiones 3x10\n- Plancha 3x30 seg\n¡Adapta según tu nivel!"
-                            "¿Cuánto tiempo debo descansar entre series?" -> "Fuerza: 2-3 min\nHipertrofia: 60-90 seg\nResistencia: 30-60 seg"
-                            "¿Es necesario hacer cardio todos los días?" -> "No. Ideal 3-5 veces/semana. Combina con fuerza."
-                            else -> "Reformula tu pregunta, por favor"
-                        }
+                        val answer = generateAnswer(question)
                         messages.add(Message(answer, false))
                     }
                 }
             )
-
-            // Botón de acción rápida
-            Button(
-                onClick = {
-                    messages.add(Message("¿Cómo empezar un programa?", true))
-                    messages.add(Message(
-                        """1. Define tus metas
-                        2. Elige 3-5 ejercicios básicos
-                        3. Empieza con 3 días/semana
-                        4. Progresa gradualmente
-                        ¡Vamos!""", false
-                    ))
-                },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(vertical = 8.dp),
-                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF4CAF50))
-            ) {
-                Text("Crear plan inicial")
-            }
         }
     }
 }
 
-// Composable para mensajes individuales
 @Composable
 fun ChatMessage(message: Message) {
     Box(
@@ -147,9 +154,12 @@ fun ChatMessage(message: Message) {
     }
 }
 
-// Composable modificado para las secciones
 @Composable
-fun Section(title: String, options: List<String>, onOptionClick: (String) -> Unit) {
+fun Section(
+    title: String,
+    options: List<String>,
+    onOptionClick: (String) -> Unit
+) {
     Column(modifier = Modifier.fillMaxWidth()) {
         Text(
             text = title,
@@ -171,5 +181,61 @@ fun Section(title: String, options: List<String>, onOptionClick: (String) -> Uni
                 )
             }
         }
+    }
+}
+
+private fun generateAnswer(question: String): String {
+    return when {
+        question.contains("brazos", ignoreCase = true) -> """
+            💪 Ejercicios para brazos:
+            • Flexiones de diamante (3x12)
+            • Curl de bíceps con mancuernas (4x10)
+            • Fondos en silla (3x15)
+            • Extensiones de tríceps (4x12)
+            Descansa 60 seg entre series
+        """.trimIndent()
+
+        question.contains("cuello", ignoreCase = true) -> """
+            😌 Masajes para dolor de cuello:
+            1. Auto-masaje con dedos: Presiona suavemente en círculos desde la base del cráneo hacia los hombros
+            2. Estiramiento lateral: Inclina la cabeza hacia un lado manteniendo 30 segundos
+            3. Uso de pelota de tenis: Recostado boca arriba, coloca la pelota en zonas tensas
+            ⚠️ Si persiste, consulta un especialista
+        """.trimIndent()
+
+        question.contains("calentamiento", ignoreCase = true) -> """
+            🔥 Rutina de calentamiento (5-10 min):
+            • Rotaciones de cuello y hombros
+            • Círculos con brazos
+            • Sentadillas sin peso (2x15)
+            • Jumping jacks (1 minuto)
+            • Estocadas dinámicas (10 por pierna)
+        """.trimIndent()
+
+        question.contains("abdominales", ignoreCase = true) -> """
+            🏋️ Ejercicios abdominales:
+            • Plancha frontal (3x30 seg)
+            • Crunch bicicleta (3x20)
+            • Elevación de piernas (3x15)
+            • Russian twists (4x20)
+            Mantén contracción constante
+        """.trimIndent()
+
+        question.contains("estiramientos", ignoreCase = true) -> """
+            🧘 Estiramientos post-entreno:
+            • Gato-vaca (espalda): 2x10 rep
+            • Estiramiento de isquiotibiales: 30 seg por pierna
+            • Estiramiento de pecho: 30 seg cada lado
+            • Torsión espinal: 20 seg cada lado
+        """.trimIndent()
+
+        else -> """
+            🤖 ¿Necesitas ayuda con?:
+            - Rutinas de ejercicio
+            - Técnicas de recuperación
+            - Planes de entrenamiento
+            - Consejos nutricionales básicos
+            Escribe tu pregunta específica
+        """.trimIndent()
     }
 }
