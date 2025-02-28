@@ -23,6 +23,9 @@ import retrofit2.Response
 import com.example.vitalife.ui.theme.components.InputField
 import android.content.Context
 import android.util.Log
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.navigation.compose.rememberNavController
+
 // Inicio del programa 1
 @Composable
 fun LoginScreen(navController: NavController) {
@@ -113,4 +116,11 @@ fun loginUser(email: String, password: String, navController: NavController, con
             Toast.makeText(context, "Error de conexión: ${t.message}", Toast.LENGTH_LONG).show()
         }
     })
+}
+
+@Preview
+@Composable
+fun VistaPreviaLoginScreen() {
+    val navController = rememberNavController()
+    LoginScreen(navController = navController)
 }

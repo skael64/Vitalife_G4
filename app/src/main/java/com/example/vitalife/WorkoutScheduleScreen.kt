@@ -16,11 +16,13 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
+import androidx.navigation.compose.rememberNavController
 
 @Composable
 fun WorkoutScheduleScreen(navController: NavController) {
@@ -181,4 +183,11 @@ fun WorkoutEventDetailsDialog(onDismiss: () -> Unit) {
             }
         }
     )
+}
+
+@Preview
+@Composable
+fun VistaPreviaWorkoutScheduleScreen() {
+    val navController = rememberNavController()
+    WorkoutScheduleScreen(navController = navController)
 }

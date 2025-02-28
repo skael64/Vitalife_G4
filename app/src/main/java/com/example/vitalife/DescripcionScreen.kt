@@ -17,6 +17,7 @@ import androidx.navigation.compose.rememberNavController
 
 @Composable
 fun DescripcionScreen(navController: NavController, ejercicio: String) {
+
     val descripcion = "El $ejercicio es un ejercicio efectivo para mejorar la resistencia y la fuerza. Sigue estos pasos para hacerlo correctamente."
 
     val pasos = when (ejercicio) {
@@ -46,11 +47,14 @@ fun DescripcionScreen(navController: NavController, ejercicio: String) {
             .fillMaxSize()
             .padding(16.dp)
     ) {
+
+        Spacer(modifier = Modifier.height(16.dp))
+
         // Título y calorías
         Text(text = ejercicio, style = MaterialTheme.typography.headlineMedium)
         Text(text = "Fácil | 390 Calorías Quemadas", fontSize = 16.sp, color = Color.Gray)
 
-        Spacer(modifier = Modifier.height(8.dp))
+        Spacer(modifier = Modifier.height(16.dp))
 
         // Descripción
         Text(text = "Descripción", fontSize = 18.sp, color = Color.Black)

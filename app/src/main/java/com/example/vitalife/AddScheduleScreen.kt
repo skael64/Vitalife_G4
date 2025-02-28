@@ -15,12 +15,14 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import java.time.LocalDate
 import java.time.LocalTime
 import java.time.format.DateTimeFormatter
+import androidx.navigation.compose.rememberNavController
 
 @Composable
 fun AddScheduleScreen(navController: NavController) {
@@ -167,4 +169,11 @@ fun GradientButton(text: String, onClick: () -> Unit) {
     ) {
         Text(text, fontSize = 18.sp, color = Color.White, fontWeight = FontWeight.Bold)
     }
+}
+
+@Preview
+@Composable
+fun VistaPreviaAddScheduleScreen() {
+    val navController = rememberNavController()
+    AddScheduleScreen(navController = navController)
 }

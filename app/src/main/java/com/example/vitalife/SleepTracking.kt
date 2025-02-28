@@ -15,6 +15,7 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
@@ -24,6 +25,7 @@ import com.github.mikephil.charting.data.Entry
 import com.github.mikephil.charting.data.LineData
 import com.github.mikephil.charting.data.LineDataSet
 import com.github.mikephil.charting.formatter.IndexAxisValueFormatter
+import androidx.navigation.compose.rememberNavController
 
 @Composable
 fun SleepTrackerScreen(onCheckClick: () -> Unit) {
@@ -259,3 +261,10 @@ fun ScheduleItem(
         }
     }
 }
+
+@Preview(showBackground = true)
+@Composable
+fun VistaPreviaSleepTrackerScreen() {
+    SleepTrackerScreen(onCheckClick = { /* Acción para el click del botón "Check" */ })
+}
+

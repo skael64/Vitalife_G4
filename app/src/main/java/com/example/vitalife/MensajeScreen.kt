@@ -79,7 +79,7 @@ fun MensajeFinalScreen(navController: NavController) {
         // Botón para salir
         Button(
             onClick = { /* Acción para cerrar la app */ },
-            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFD32F2F)), // Rojo
+            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFE91E63)), // Rojo
             modifier = Modifier.fillMaxWidth(),
             shape = RoundedCornerShape(12.dp)
         ) {

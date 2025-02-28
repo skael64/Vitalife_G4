@@ -14,12 +14,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.vitalife.api.RetrofitClient
 import com.example.vitalife.model.UserProfile
 import com.example.vitalife.model.UserResponse
+import androidx.navigation.compose.rememberNavController
 
 import retrofit2.Call
 import retrofit2.Callback
@@ -223,4 +225,11 @@ fun fetchUserProfile(userId: Int, onResult: (UserProfile?) -> Unit) {
             onResult(null)
         }
     })
+}
+
+@Preview(showBackground = true)
+@Composable
+fun VistaPreviaProfileScreen() {
+    val navController = rememberNavController()
+    ProfileScreen(navController = navController, userId = 1) // Pasamos un valor predeterminado para userId
 }

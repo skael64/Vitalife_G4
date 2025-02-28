@@ -15,6 +15,7 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
@@ -26,6 +27,7 @@ import retrofit2.Callback
 import retrofit2.Response
 import java.text.SimpleDateFormat
 import java.util.Locale
+import androidx.navigation.compose.rememberNavController
 
 @Composable
 fun RegisterScreen(navController: NavController) {
@@ -209,4 +211,11 @@ fun registerUser(
             Toast.makeText(context, "Error de conexión: ${t.message}", Toast.LENGTH_LONG).show()
         }
     })
+}
+
+@Preview
+@Composable
+fun VistaPreviaRegisterScreen() {
+    val navController = rememberNavController()
+    RegisterScreen(navController = navController)
 }

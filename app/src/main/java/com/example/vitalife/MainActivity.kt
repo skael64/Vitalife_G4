@@ -46,9 +46,22 @@ fun AppNavHost(navController: NavHostController) {
         }
         composable("sleepTracking") { SleepTrackerScreen(onCheckClick = {navController.navigate("schedule")}) }
         composable("workoutTracker") { WorkoutTrackerScreen(navController) }
-        composable("schedule") { ScheduleScreen(navController) }
+        //composable("schedule") { ScheduleScreen(navController) }
         composable("addSchedule") { AddScheduleScreen(navController) } // ✅ Nueva pantalla añadida
 
-        
+        // INTERFAZ 2
+        composable("-") { LoginScreen(navController) }
+        composable("-") { LoginScreen(navController) }
+
+        // INTERFAZ 4
+        composable("entrenamiento") { EntrenamientoScreen(navController) }
+        composable("descripcion") { DescripcionScreen(
+            navController,
+            ejercicio = TODO()
+        ) }
+        composable("cronometro") { LoginScreen(navController) }
+        composable("mensaje") { LoginScreen(navController) }
     }
 }
+
+
