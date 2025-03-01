@@ -1,5 +1,6 @@
 # 🌿 VITALIFE - Aplicación de Estilo de Vida Saludable.
 
+
 VITALIFE es una aplicación móvil diseñada para ayudar a los usuarios a mejorar su estilo de vida mediante el seguimiento de actividad física, monitoreo del sueño, control de hidratación, gestor de medicamentos y más. La aplicación permite a los usuarios registrarse, iniciar sesión y visualizar su perfil con información detallada sobre su estado de salud.
 
 ---
