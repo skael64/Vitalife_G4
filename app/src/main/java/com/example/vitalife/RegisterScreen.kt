@@ -30,6 +30,7 @@ import retrofit2.Response
 import java.text.SimpleDateFormat
 import java.util.Locale
 import androidx.navigation.compose.rememberNavController
+import com.example.vitalife.utils.SharedHelper
 
 @Composable
 fun RegisterScreen(navController: NavController) {
@@ -44,6 +45,8 @@ fun RegisterScreen(navController: NavController) {
     var nivelActividad by remember { mutableStateOf("Sedentario") }
     var acceptedTerms by remember { mutableStateOf(false) }
     val context = LocalContext.current
+    // Instancia de SharedPreferencesHelper
+    val sharedHelper = remember { SharedHelper(context) }
 
     Column(
         modifier = Modifier.fillMaxSize().padding(16.dp).verticalScroll(rememberScrollState()),
@@ -100,7 +103,7 @@ fun RegisterScreen(navController: NavController) {
                     if (acceptedTerms) {
                         registerUser(
                             nombres, apellidos, email, password, fechaNacimiento, peso, talla, genero, nivelActividad,
-                            navController, context
+                            navController, context, sharedHelper
                         )
                     } else {
                         Toast.makeText(context, "Debes aceptar los términos", Toast.LENGTH_SHORT).show()
@@ -179,7 +182,7 @@ fun DropdownField(label: String, selectedValue: String, options: List<String>, o
 fun registerUser(
     nombres: String, apellidos: String, email: String, password: String,
     fechaNacimiento: String?, peso: String?, talla: String?, genero: String, nivelActividad: String,
-    navController: NavController, context: android.content.Context
+    navController: NavController, context: android.content.Context, sharedHelper: SharedHelper
 ) {
     val pesoDouble = peso?.toDoubleOrNull()
     val tallaDouble = talla?.toDoubleOrNull()
@@ -216,6 +219,9 @@ fun registerUser(
                     Toast.makeText(context, registerResponse.message, Toast.LENGTH_LONG).show()
                     // Guardar el userId si es necesario
                     val userId = registerResponse.userId
+
+                    // Guardar el userId en SharedPreferences
+                    sharedHelper.saveUserId(userId)
                     navController.navigate("profile") // Navegar a la pantalla de perfil
                 } else {
                     // Error en el registro
