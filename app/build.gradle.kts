@@ -27,7 +27,6 @@ android {
             )
         }
     }
-
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
@@ -84,4 +83,9 @@ dependencies {
     androidTestImplementation(libs.androidx.ui.test.junit4)
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
+
+    // 📌 Vista Previa
+    implementation ("androidx.compose.ui:ui:1.4.0")
+    implementation ("androidx.compose.ui:ui-tooling-preview:1.4.0")
+
 }

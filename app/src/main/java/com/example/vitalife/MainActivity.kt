@@ -9,6 +9,9 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.vitalife.ui.theme.VitalifeTheme
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
+
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -41,9 +44,22 @@ fun AppNavHost(navController: NavHostController) {
             val userId = backStackEntry.arguments?.getString("userId")?.toIntOrNull() ?: 0
             ProfileScreen(navController, userId)
         }
-        composable("sleepTracking") { SleepTrackerScreen(onCheckClick = { navController.navigate("schedule") }) }
+        composable("sleepTracking") { SleepTrackerScreen(onCheckClick = {navController.navigate("schedule")}) }
         composable("workoutTracker") { WorkoutTrackerScreen(navController) }
-        composable("workoutSchedule") { WorkoutScheduleScreen(navController) }
-        composable("addSchedule") { AddScheduleScreen(navController) }
+        //composable("schedule") { ScheduleScreen(navController) }
+        composable("addSchedule") { AddScheduleScreen(navController) } // ✅ Nueva pantalla añadida
+
+        // INTERFAZ 2
+        composable("-") { LoginScreen(navController) }
+        composable("-") { LoginScreen(navController) }
+
+        // INTERFAZ 4
+        composable("entrenamiento") { EntrenamientoScreen(navController) }
+        composable("descripcion") { DescripcionScreen(
+            navController,
+            ejercicio = TODO()
+        ) }
+        composable("cronometro") { LoginScreen(navController) }
+        composable("mensaje") { LoginScreen(navController) }
     }
 }

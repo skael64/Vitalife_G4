@@ -18,8 +18,10 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
 
 import androidx.compose.material3.ButtonDefaults // Modificar boton independiente
+import androidx.compose.ui.tooling.preview.Preview
 
 @Composable
 fun OnboardingScreen(navController: NavController) {
@@ -81,4 +83,11 @@ fun OnboardingScreen(navController: NavController) {
             }
         }
     }
+}
+
+@Preview
+@Composable
+fun VistaPreviaOnboardingScreen() {
+    val navController = rememberNavController()
+    OnboardingScreen(navController = navController)
 }

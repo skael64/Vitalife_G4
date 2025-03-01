@@ -3,7 +3,6 @@ package com.example.vitalife
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
@@ -15,13 +14,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import java.time.Duration
 import java.time.LocalTime
 import java.time.format.DateTimeFormatter
-import kotlin.math.cos
-import kotlin.math.sin
+import androidx.navigation.compose.rememberNavController
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -31,18 +29,10 @@ fun AddAlarmScreen(
 ) {
     var showTimePicker by remember { mutableStateOf(false) }
     var selectedTime by remember { mutableStateOf(LocalTime.of(22, 0)) }
+    var showDurationPicker by remember { mutableStateOf(false) }
+    var selectedDuration by remember { mutableStateOf("8horas 30minutos") }
     var selectedDays by remember { mutableStateOf(setOf("Lun", "Mar", "Mie", "Jue", "Vie")) }
     var vibrationEnabled by remember { mutableStateOf(true) }
-
-    // Get current time for sleep duration calculation
-    val currentTime = remember { LocalTime.now() }
-
-    // Calculate sleep duration
-    val sleepDuration by remember(currentTime, selectedTime) {
-        derivedStateOf {
-            calculateSleepDuration(currentTime, selectedTime)
-        }
-    }
 
     Column(
         modifier = Modifier
@@ -86,7 +76,7 @@ fun AddAlarmScreen(
                 )
                 Column(modifier = Modifier.weight(1f)) {
                     Text(
-                        text = "Sonar alarma a las:",
+                        text = "Hora de Dormir",
                         color = Color.Gray
                     )
                     Text(
@@ -100,9 +90,11 @@ fun AddAlarmScreen(
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        // Horas de sueño (calculated automatically)
+        // Horas de sueño
         Card(
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier
+                .fillMaxWidth()
+                .clickable { showDurationPicker = true },
             colors = CardDefaults.cardColors(containerColor = Color(0xFFE8F5E9))
         ) {
             Row(
@@ -120,7 +112,7 @@ fun AddAlarmScreen(
                         color = Color.Gray
                     )
                     Text(
-                        text = sleepDuration,
+                        text = selectedDuration,
                         fontSize = 18.sp,
                         fontWeight = FontWeight.Bold
                     )
@@ -190,14 +182,24 @@ fun AddAlarmScreen(
             }
         }
 
-        // Modern Clock-style Time Picker Dialog
+        // Time Picker Dialog
         if (showTimePicker) {
-            ModernTimePickerDialog(
-                initialTime = selectedTime,
+            TimePickerDialog(
                 onDismiss = { showTimePicker = false },
                 onTimeSelected = {
                     selectedTime = it
                     showTimePicker = false
+                }
+            )
+        }
+
+        // Duration Picker Dialog
+        if (showDurationPicker) {
+            DurationPickerDialog(
+                onDismiss = { showDurationPicker = false },
+                onDurationSelected = {
+                    selectedDuration = it
+                    showDurationPicker = false
                 }
             )
         }
@@ -223,211 +225,6 @@ fun AddAlarmScreen(
 }
 
 @Composable
-fun ModernTimePickerDialog(
-    initialTime: LocalTime,
-    onDismiss: () -> Unit,
-    onTimeSelected: (LocalTime) -> Unit
-) {
-    var hour by remember { mutableStateOf(initialTime.hour) }
-    var minute by remember { mutableStateOf(initialTime.minute) }
-    var isPM by remember { mutableStateOf(initialTime.hour >= 12) }
-
-    // Convert to 12-hour format for display
-    var displayHour by remember(hour) {
-        mutableStateOf(if (hour % 12 == 0) 12 else hour % 12)
-    }
-
-    // Keep track of which wheel is active (hour or minute)
-    var isHourSelection by remember { mutableStateOf(true) }
-
-    AlertDialog(
-        onDismissRequest = onDismiss,
-        modifier = Modifier.fillMaxWidth(),
-        title = {
-            Text(
-                text = "Seleccionar hora",
-                modifier = Modifier.fillMaxWidth(),
-                textAlign = androidx.compose.ui.text.style.TextAlign.Center
-            )
-        },
-        text = {
-            Column(
-                horizontalAlignment = Alignment.CenterHorizontally,
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                // Display current selection
-                Row(
-                    horizontalArrangement = Arrangement.Center,
-                    verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    Text(
-                        text = String.format("%02d", displayHour),
-                        fontSize = 34.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = if (isHourSelection) Color(0xFF81C784) else Color.Gray,
-                        modifier = Modifier
-                            .clickable { isHourSelection = true }
-                            .padding(8.dp)
-                    )
-                    Text(
-                        text = ":",
-                        fontSize = 34.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = Color.Gray
-                    )
-                    Text(
-                        text = String.format("%02d", minute),
-                        fontSize = 34.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = if (!isHourSelection) Color(0xFF81C784) else Color.Gray,
-                        modifier = Modifier
-                            .clickable { isHourSelection = false }
-                            .padding(8.dp)
-                    )
-                    Spacer(modifier = Modifier.width(16.dp))
-                    Column {
-                        Text(
-                            text = "AM",
-                            fontSize = 20.sp,
-                            fontWeight = FontWeight.Medium,
-                            color = if (!isPM) Color(0xFF81C784) else Color.Gray,
-                            modifier = Modifier
-                                .clickable {
-                                    isPM = false
-                                    hour = if (hour >= 12) hour - 12 else hour
-                                }
-                                .padding(4.dp)
-                        )
-                        Text(
-                            text = "PM",
-                            fontSize = 20.sp,
-                            fontWeight = FontWeight.Medium,
-                            color = if (isPM) Color(0xFF81C784) else Color.Gray,
-                            modifier = Modifier
-                                .clickable {
-                                    isPM = true
-                                    hour = if (hour < 12) hour + 12 else hour
-                                }
-                                .padding(4.dp)
-                        )
-                    }
-                }
-
-                Spacer(modifier = Modifier.height(16.dp))
-
-                // Number selection wheel
-                Box(
-                    contentAlignment = Alignment.Center,
-                    modifier = Modifier
-                        .size(280.dp)
-                        .padding(16.dp)
-                ) {
-                    // Background circle
-                    Box(
-                        modifier = Modifier
-                            .size(240.dp)
-                            .clip(CircleShape)
-                            .background(Color(0xFFE8F5E9))
-                    )
-
-                    // Center circle
-                    Box(
-                        modifier = Modifier
-                            .size(24.dp)
-                            .clip(CircleShape)
-                            .background(Color(0xFF81C784))
-                    )
-
-                    // Numbers
-                    if (isHourSelection) {
-                        // Hours (1-12)
-                        for (i in 1..12) {
-                            val angleRad = Math.PI * 2 * (i - 3) / 12
-                            val radius = 100f
-                            val x = cos(angleRad.toFloat()) * radius
-                            val y = sin(angleRad.toFloat()) * radius
-
-                            val isSelected = displayHour == i
-
-                            Box(
-                                contentAlignment = Alignment.Center,
-                                modifier = Modifier
-                                    .offset(x = x.dp, y = y.dp)
-                                    .size(40.dp)
-                                    .clip(CircleShape)
-                                    .background(if (isSelected) Color(0xFF81C784) else Color.Transparent)
-                                    .clickable {
-                                        displayHour = i
-                                        // Convert to 24 hour format
-                                        hour = if (isPM) {
-                                            if (i == 12) 12 else i + 12
-                                        } else {
-                                            if (i == 12) 0 else i
-                                        }
-                                    }
-                            ) {
-                                Text(
-                                    text = "$i",
-                                    color = if (isSelected) Color.White else Color.Black,
-                                    fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal
-                                )
-                            }
-                        }
-                    } else {
-                        // Minutes (in increments of 5)
-                        for (i in 0..11) {
-                            val minuteValue = i * 5
-                            val angleRad = Math.PI * 2 * (i - 3) / 12
-                            val radius = 100f
-                            val x = cos(angleRad.toFloat()) * radius
-                            val y = sin(angleRad.toFloat()) * radius
-
-                            val isSelected = minute / 5 * 5 == minuteValue
-
-                            Box(
-                                contentAlignment = Alignment.Center,
-                                modifier = Modifier
-                                    .offset(x = x.dp, y = y.dp)
-                                    .size(40.dp)
-                                    .clip(CircleShape)
-                                    .background(if (isSelected) Color(0xFF81C784) else Color.Transparent)
-                                    .clickable {
-                                        minute = minuteValue
-                                    }
-                            ) {
-                                Text(
-                                    text = String.format("%02d", minuteValue),
-                                    color = if (isSelected) Color.White else Color.Black,
-                                    fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal
-                                )
-                            }
-                        }
-                    }
-                }
-            }
-        },
-        confirmButton = {
-            TextButton(onClick = {
-                val finalHour = if (isPM) {
-                    if (displayHour == 12) 12 else displayHour + 12
-                } else {
-                    if (displayHour == 12) 0 else displayHour
-                }
-                onTimeSelected(LocalTime.of(finalHour, minute))
-            }) {
-                Text("OK")
-            }
-        },
-        dismissButton = {
-            TextButton(onClick = onDismiss) {
-                Text("Cancelar")
-            }
-        }
-    )
-}
-
-@Composable
 fun DayChip(
     day: String,
     selected: Boolean,
@@ -449,22 +246,125 @@ fun DayChip(
     }
 }
 
-// Helper function to calculate sleep duration based on current time and selected alarm time
-private fun calculateSleepDuration(currentTime: LocalTime, alarmTime: LocalTime): String {
-    var hours = if (alarmTime.isBefore(currentTime)) {
-        // If alarm is set for tomorrow
-        24 - currentTime.hour + alarmTime.hour
-    } else {
-        alarmTime.hour - currentTime.hour
-    }
+@Composable
+fun TimePickerDialog(
+    onDismiss: () -> Unit,
+    onTimeSelected: (LocalTime) -> Unit
+) {
+    var selectedHour by remember { mutableStateOf(22) }
+    var selectedMinute by remember { mutableStateOf(0) }
 
-    var minutes = alarmTime.minute - currentTime.minute
-
-    // Adjust for minute differences
-    if (minutes < 0) {
-        minutes += 60
-        hours -= 1
-    }
-
-    return "${hours}horas ${minutes}minutos"
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text("Seleccionar hora") },
+        text = {
+            Row(
+                horizontalArrangement = Arrangement.SpaceEvenly,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                // Selector de hora
+                NumberPicker(
+                    value = selectedHour,
+                    onValueChange = { selectedHour = it },
+                    range = 0..23
+                )
+                Text(":")
+                // Selector de minutos
+                NumberPicker(
+                    value = selectedMinute,
+                    onValueChange = { selectedMinute = it },
+                    range = 0..59
+                )
+            }
+        },
+        confirmButton = {
+            TextButton(onClick = {
+                onTimeSelected(LocalTime.of(selectedHour, selectedMinute))
+            }) {
+                Text("OK")
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = onDismiss) {
+                Text("Cancelar")
+            }
+        }
+    )
 }
+
+@Composable
+fun DurationPickerDialog(
+    onDismiss: () -> Unit,
+    onDurationSelected: (String) -> Unit
+) {
+    var selectedHours by remember { mutableStateOf(8) }
+    var selectedMinutes by remember { mutableStateOf(30) }
+
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text("Seleccionar duración") },
+        text = {
+            Row(
+                horizontalArrangement = Arrangement.SpaceEvenly,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                // Selector de horas
+                NumberPicker(
+                    value = selectedHours,
+                    onValueChange = { selectedHours = it },
+                    range = 0..12
+                )
+                Text("horas")
+                // Selector de minutos
+                NumberPicker(
+                    value = selectedMinutes,
+                    onValueChange = { selectedMinutes = it },
+                    range = 0..59
+                )
+                Text("min")
+            }
+        },
+        confirmButton = {
+            TextButton(onClick = {
+                onDurationSelected("${selectedHours}horas ${selectedMinutes}minutos")
+            }) {
+                Text("OK")
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = onDismiss) {
+                Text("Cancelar")
+            }
+        }
+    )
+}
+
+@Composable
+fun NumberPicker(
+    value: Int,
+    onValueChange: (Int) -> Unit,
+    range: IntRange
+) {
+    Column {
+        range.forEach { number ->
+            Text(
+                text = String.format("%02d", number),
+                modifier = Modifier
+                    .clickable { onValueChange(number) }
+                    .padding(vertical = 4.dp),
+                color = if (number == value) Color(0xFF81C784) else Color.Gray,
+                fontWeight = if (number == value) FontWeight.Bold else FontWeight.Normal
+            )
+        }
+    }
+}
+
+@Preview
+@Composable
+fun VistaPreviaAddAlarmScreen() {
+    AddAlarmScreen(
+        onBackClick = { /* Acción para volver atrás */ },
+        onAddClick = { /* Acción para agregar la alarma */ }
+    )
+}
+
