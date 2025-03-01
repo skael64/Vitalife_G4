@@ -18,36 +18,20 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 
 @Composable
-fun SleepApp() {
-    val navController = rememberNavController()
-
-    NavHost(navController = navController, startDestination = "tracker") {
-        composable("tracker") {
-            SleepTrackerScreen(
-                onCheckClick = { navController.navigate("schedule") }
-            )
-        }
-        composable("schedule") {
-            SleepScheduleScreen(
-                onBackClick = { navController.navigateUp() },
-                onAddClick = { navController.navigate("add-alarm") }
-            )
-        }
-        composable("add-alarm") {
-            AddAlarmScreen(
-                onBackClick = { navController.navigateUp() },
-                onAddClick = {
-                    // Aquí podrías agregar lógica para guardar la alarma si tuvieras backend
-                    navController.navigateUp()
-                }
-            )
-        }
+fun SleepScheduleScreen(navController: NavController) {
+    Column {
+        SleepScheduleScreen(
+            onBackClick = { navController.popBackStack() },
+            onAddClick = { navController.navigate("addAlarm") }
+        )
     }
+
 }
 
 @Composable
@@ -235,9 +219,7 @@ fun DayItem(
 @Preview(showBackground = true)
 @Composable
 fun VistaPreviaSleepScheduleScreen() {
-    SleepScheduleScreen(
-        onBackClick = { /* Lógica de retroceso en vista previa (puedes dejarlo vacío) */ },
-        onAddClick = { /* Lógica de añadir alarma en vista previa (puedes dejarlo vacío) */ }
-    )
+    val navController = rememberNavController()
+    SleepScheduleScreen(navController = navController)
 }
 

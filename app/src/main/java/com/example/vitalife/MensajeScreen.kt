@@ -66,7 +66,7 @@ fun MensajeFinalScreen(navController: NavController) {
 
         // Botón para el siguiente entrenamiento
         Button(
-            onClick = { navController.navigate("entrenamiento") },
+            onClick = { navController.navigate("cronometro") },
             colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF4CAF50)), // Verde
             modifier = Modifier.fillMaxWidth(),
             shape = RoundedCornerShape(12.dp)
@@ -78,7 +78,7 @@ fun MensajeFinalScreen(navController: NavController) {
 
         // Botón para salir
         Button(
-            onClick = { /* Acción para cerrar la app */ },
+            onClick = { navController.popBackStack() },
             colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFE91E63)), // Rojo
             modifier = Modifier.fillMaxWidth(),
             shape = RoundedCornerShape(12.dp)
@@ -90,7 +90,7 @@ fun MensajeFinalScreen(navController: NavController) {
 
         // Botón para regresar al inicio
         Button(
-            onClick = { navController.navigate("inicio") },
+            onClick = { navController.navigate("home") },
             colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF1976D2)), // Azul
             modifier = Modifier.fillMaxWidth(),
             shape = RoundedCornerShape(12.dp)

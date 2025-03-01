@@ -25,6 +25,7 @@ import android.content.Context
 import android.util.Log
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.compose.rememberNavController
+import com.example.vitalife.utils.SharedHelper
 
 // Inicio del programa 1
 @Composable
@@ -32,7 +33,8 @@ fun LoginScreen(navController: NavController) {
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     val context = LocalContext.current
-
+    // Instancia de SharedPreferencesHelper
+    val sharedHelper = remember { SharedHelper(context) }
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -56,7 +58,7 @@ fun LoginScreen(navController: NavController) {
         Button(
             onClick = {
                 if (email.isNotEmpty() && password.isNotEmpty()) {
-                    loginUser(email, password, navController, context)
+                    loginUser(email, password, navController, context, sharedHelper)
                 } else {
                     Toast.makeText(context, "Completa todos los campos", Toast.LENGTH_SHORT).show()
                 }
@@ -80,7 +82,7 @@ fun LoginScreen(navController: NavController) {
 }
 
 // 📌 Función para Iniciar Sesión con Retrofit
-fun loginUser(email: String, password: String, navController: NavController, context: Context) {
+fun loginUser(email: String, password: String, navController: NavController, context: Context, sharedHelper: SharedHelper) {
     val request = LoginRequest(email, password)
     val call = RetrofitClient.instance.login(request)
 
@@ -98,6 +100,10 @@ fun loginUser(email: String, password: String, navController: NavController, con
                         val apellidos = loginResponse.apellidos ?: ""
                         val fullName = "$nombres $apellidos".trim()
                         val userId = loginResponse.userId ?: 0
+
+                        // Guardar el userId en SharedPreferences
+                        sharedHelper.saveUserId(userId)
+
 
                         // ✅ Navegación corregida a WelcomeScreen con nombre e ID del usuario
                         navController.navigate("welcome/$fullName/$userId") {

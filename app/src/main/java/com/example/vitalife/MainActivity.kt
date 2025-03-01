@@ -1,17 +1,21 @@
 package com.example.vitalife
 
+import EntrenamientoScreen
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.runtime.Composable
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Scaffold
+import androidx.compose.runtime.*
+import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import com.example.vitalife.navigation.BottomNavBar
+import com.example.vitalife.navigation.NavItemList
 import com.example.vitalife.ui.theme.VitalifeTheme
-import java.time.LocalDate
-import java.time.format.DateTimeFormatter
-
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -19,10 +23,8 @@ class MainActivity : ComponentActivity() {
 
         setContent {
             VitalifeTheme {
-                //SleepApp()
                 val navController = rememberNavController()
                 AppNavHost(navController = navController)
-                //WorkoutTrackerApp()
             }
         }
     }
@@ -30,36 +32,61 @@ class MainActivity : ComponentActivity() {
 
 @Composable
 fun AppNavHost(navController: NavHostController) {
-    NavHost(navController = navController, startDestination = "splash") {
-        composable("splash") { SplashScreen(navController) }
-        composable("onboarding") { OnboardingScreen(navController) }
-        composable("register") { RegisterScreen(navController) }
-        composable("login") { LoginScreen(navController) }
-        composable("welcome/{userName}/{userId}") { backStackEntry ->
-            val userName = backStackEntry.arguments?.getString("userName") ?: "Usuario"
-            val userId = backStackEntry.arguments?.getString("userId")?.toIntOrNull()
-            WelcomeScreen(navController, userName, userId)
-        }
-        composable("profile/{userId}") { backStackEntry ->
-            val userId = backStackEntry.arguments?.getString("userId")?.toIntOrNull() ?: 0
-            ProfileScreen(navController, userId)
-        }
-        composable("sleepTracking") { SleepTrackerScreen(onCheckClick = {navController.navigate("schedule")}) }
-        composable("workoutTracker") { WorkoutTrackerScreen(navController) }
-        //composable("schedule") { ScheduleScreen(navController) }
-        composable("addSchedule") { AddScheduleScreen(navController) } // ✅ Nueva pantalla añadida
+    var selectedIndex by remember { mutableStateOf(0) } // Índice seleccionado en el NavBar
 
-        // INTERFAZ 2
-        composable("-") { LoginScreen(navController) }
-        composable("-") { LoginScreen(navController) }
+    Scaffold(
+        bottomBar = {
+            // Mostrar el NavBar solo en las pantallas principales
+            val currentRoute = navController.currentBackStackEntryAsState().value?.destination?.route
+            if (currentRoute in listOf("home", "profile", "chat")) {
+                BottomNavBar(
+                    navItemList = NavItemList.navItemList,
+                    selectedIndex = selectedIndex,
+                    onItemSelected = { index ->
+                        selectedIndex = index
+                        when (index) {
+                            0 -> navController.navigate("profile")
+                            1 -> navController.navigate("home")
+                            2 -> navController.navigate("chat")
+                        }
+                    }
+                )
+            }
+        }
+    ) { innerPadding ->
+        NavHost(
+            navController = navController,
+            startDestination = "splash",
+            modifier = Modifier.padding(innerPadding)
+        ) {
+            composable("splash") { SplashScreen(navController) }
+            composable("onboarding") { OnboardingScreen(navController) }
+            composable("register") { RegisterScreen(navController) }
+            composable("login") { LoginScreen(navController) }
+            composable("welcome/{userName}/{userId}") { backStackEntry ->
+                val userName = backStackEntry.arguments?.getString("userName") ?: "Usuario"
+                val userId = backStackEntry.arguments?.getString("userId")?.toIntOrNull()
+                WelcomeScreen(navController, userName, userId)
+            }
+            composable("profile/{userId}") { backStackEntry ->
+                val userId = backStackEntry.arguments?.getString("userId")?.toIntOrNull() ?: 0
+                ProfileScreen(navController)
+            }
+            composable("profile") { ProfileScreen(navController) }
+            composable("home") { HomeScreen(navController) }
+            composable("chat") { ChatBotScreen(navController) }
+            composable("notifications") { NotificationsScreen(navController) }
+            composable("sleepTracking") { SleepTrackerScreen(navController) }
+            composable("sleepSchedule") { SleepScheduleScreen(navController) }
+            composable("addAlarm") { AddAlarmScreen(navController) }
 
-        // INTERFAZ 4
-        composable("entrenamiento") { EntrenamientoScreen(navController) }
-        composable("descripcion") { DescripcionScreen(
-            navController,
-            ejercicio = TODO()
-        ) }
-        composable("cronometro") { LoginScreen(navController) }
-        composable("mensaje") { LoginScreen(navController) }
+            composable("workoutTracker") { WorkoutTrackerScreen(navController) }
+            composable("workoutSchedule") { WorkoutScheduleScreen(navController) }
+            composable("addSchedule") { AddScheduleScreen(navController) }
+            composable("entrenamiento") { EntrenamientoScreen(navController) }
+            composable("descripcion") { DescripcionScreen(navController, "Salto de tijera" ) }
+            composable("cronometro") { CronometroScreen(navController, "Salto de tijera") }
+            composable("mensaje") { MensajeFinalScreen(navController) }
+        }
     }
 }

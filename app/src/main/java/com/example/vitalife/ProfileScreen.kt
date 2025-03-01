@@ -4,7 +4,9 @@ import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.*
@@ -13,31 +15,46 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.vitalife.api.RetrofitClient
 import com.example.vitalife.model.UserProfile
 import com.example.vitalife.model.UserProfileResponse
 import androidx.navigation.compose.rememberNavController
-
+import com.example.vitalife.utils.SharedHelper
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 
 @Composable
-fun ProfileScreen(navController: NavController, userId: Int) {
+fun ProfileScreen(navController: NavController) {
     var userProfile by remember { mutableStateOf<UserProfile?>(null) }
     var isLoading by remember { mutableStateOf(true) }
     var notificationEnabled by remember { mutableStateOf(true) }
+    // Obtener el contexto
+    val context = LocalContext.current
+
+    // Instancia de SharedPreferencesHelper
+    val sharedPreferencesHelper = remember { SharedHelper(context) }
+
+    // Obtener el userId desde SharedPreferences
+    val userId = sharedPreferencesHelper.getUserId()
 
     LaunchedEffect(userId) {
-        Log.d("ProfileDebug", "Obteniendo perfil para userId: $userId")
+        if (userId != null) {
+            Log.d("ProfileDebug", "Obteniendo perfil para userId: $userId")
 
-        fetchUserProfile(userId) { profile ->
-            userProfile = profile
+            fetchUserProfile(userId!!) { profile ->
+                userProfile = profile
+                isLoading = false
+            }
+        } else {
+            Log.e("ProfileError", "userId es nulo")
             isLoading = false
         }
     }
@@ -58,18 +75,20 @@ fun ProfileScreen(navController: NavController, userId: Int) {
                 val user = userProfile!!
 
                 Column(
-                    modifier = Modifier.fillMaxSize().padding(16.dp),
+                    modifier = Modifier.fillMaxSize().padding(16.dp).verticalScroll(
+                        rememberScrollState()
+                    ),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    // 🔹 Botón de regresar
+                    /*
                     Row(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.Start
                     ) {
-                        IconButton(onClick = { navController.popBackStack() }) {
+                        IconButton(onClick = { navController.navigate("home") }) {
                             Icon(Icons.Default.ArrowBack, contentDescription = "Volver")
                         }
-                    }
+                    }*/
 
                     Spacer(modifier = Modifier.height(16.dp))
 
@@ -100,20 +119,11 @@ fun ProfileScreen(navController: NavController, userId: Int) {
                     Spacer(modifier = Modifier.height(24.dp))
 
                     // 🔹 Sección Cuenta
-                    // 🔹 Sección Cuenta
                     SectionCard(
                         title = "Cuenta",
                         items = listOf("Datos Personales", "Logros", "Historial de Actividades", "Progreso de Entrenamiento"),
                         navController = navController
                     )
-
-                    // 🔹 Sección Otros
-                    SectionCard(
-                        title = "Otros",
-                        items = listOf("Contáctanos", "Política de privacidad", "Ajustes"),
-                        navController = navController
-                    )
-
 
                     Spacer(modifier = Modifier.height(16.dp))
 
@@ -132,7 +142,6 @@ fun ProfileScreen(navController: NavController, userId: Int) {
                         items = listOf("Contáctanos", "Política de privacidad", "Ajustes"),
                         navController = navController
                     )
-
                 }
             }
         }
@@ -173,7 +182,8 @@ fun SectionCard(title: String, items: List<String>, navController: NavController
                     .fillMaxWidth()
                     .clickable {
                         when (item) {
-                            "Historial de Actividades" -> navController.navigate("workoutTracker")
+                            "Historial de Actividades" -> navController.navigate("entrenamiento")
+                            "Progreso de Entrenamiento" -> navController.navigate("workoutTracker") // Navegar al progreso de entrenamiento
                         }
                     }
                     .padding(vertical = 8.dp)
@@ -231,5 +241,5 @@ fun fetchUserProfile(userId: Int, onResult: (UserProfile?) -> Unit) {
 @Composable
 fun VistaPreviaProfileScreen() {
     val navController = rememberNavController()
-    ProfileScreen(navController = navController, userId = 1) // Pasamos un valor predeterminado para userId
+    HomeScreen(navController = navController)
 }

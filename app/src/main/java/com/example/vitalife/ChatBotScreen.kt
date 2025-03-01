@@ -3,6 +3,9 @@ package com.example.vitalife
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
@@ -14,6 +17,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -24,6 +28,9 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.compose.rememberNavController
 
@@ -35,7 +42,9 @@ fun ChatBotScreen(navController: NavController) {
     val messages = remember { mutableStateListOf<Message>() }
     val userInput = remember { mutableStateOf("") }
     val coroutineScope = rememberCoroutineScope()
-
+    val keyboardController = LocalSoftwareKeyboardController.current // Controlador del teclado
+    val focusRequester = remember { FocusRequester() } // Para manejar el foco
+    val isExpanded = remember { mutableStateOf(false) } // Estado para controlar la expansión
     Column(modifier = Modifier.fillMaxSize()) {
         // Cabecera
         Row(
@@ -44,9 +53,6 @@ fun ChatBotScreen(navController: NavController) {
                 .padding(16.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            IconButton(onClick = { navController.popBackStack() }) {
-                Icon(Icons.Default.ArrowBack, contentDescription = "Volver")
-            }
             Text(
                 text = "Fitness Bot",
                 fontSize = 24.sp,
@@ -85,8 +91,10 @@ fun ChatBotScreen(navController: NavController) {
                 onValueChange = { userInput.value = it },
                 modifier = Modifier
                     .weight(1f)
-                    .padding(end = 8.dp),
-                placeholder = { Text("Escribe tu pregunta...") }
+                    .padding(end = 8.dp)
+                    .focusRequester(focusRequester),
+                shape = RoundedCornerShape(15.dp),
+                placeholder = { Text("Escribe tu consulta...") }
             )
 
             Button(
@@ -95,7 +103,8 @@ fun ChatBotScreen(navController: NavController) {
                         val question = userInput.value
                         messages.add(Message(question, true))
                         userInput.value = ""
-
+                        // Ocultar el teclado
+                        keyboardController?.hide()
                         coroutineScope.launch {
                             val answer = generateAnswer(question)
                             messages.add(Message(answer, false))
@@ -107,29 +116,46 @@ fun ChatBotScreen(navController: NavController) {
             }
         }
 
-        // Sección de preguntas rápidas
-        Column(
+        // Sección de preguntas rápidas (contraíble/expandible)
+        Card(
             modifier = Modifier
+                .fillMaxWidth()
                 .padding(16.dp)
-                .verticalScroll(rememberScrollState())
+                .clickable { isExpanded.value = !isExpanded.value }, // Alternar expansión
+            shape = RoundedCornerShape(8.dp),
+            colors = CardDefaults.cardColors(containerColor = Color(0xFFE3F2FD))
         ) {
-            Section(
-                title = "Preguntas rápidas",
-                options = listOf(
-                    "Ejercicios para brazos",
-                    "Masajes para dolor de cuello",
-                    "Rutina de calentamiento",
-                    "Ejercicios abdominales",
-                    "Estiramientos post-entreno"
-                ),
-                onOptionClick = { question ->
-                    messages.add(Message(question, true))
-                    coroutineScope.launch {
-                        val answer = generateAnswer(question)
-                        messages.add(Message(answer, false))
-                    }
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp)
+            ) {
+                Text(
+                    text = "Preguntas rápidas",
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Bold
+                )
+
+                if (isExpanded.value) {
+                    Spacer(modifier = Modifier.height(8.dp))
+                    QuickQuestionsList(
+                        options = listOf(
+                            "Ejercicios para brazos",
+                            "Masajes para dolor de cuello",
+                            "Rutina de calentamiento",
+                            "Ejercicios abdominales",
+                            "Estiramientos post-entreno"
+                        ),
+                        onOptionClick = { question ->
+                            messages.add(Message(question, true))
+                            coroutineScope.launch {
+                                val answer = generateAnswer(question)
+                                messages.add(Message(answer, false))
+                            }
+                        }
+                    )
                 }
-            )
+            }
         }
     }
 }
@@ -157,23 +183,18 @@ fun ChatMessage(message: Message) {
 }
 
 @Composable
-fun Section(
-    title: String,
+fun QuickQuestionsList(
     options: List<String>,
     onOptionClick: (String) -> Unit
 ) {
     Column(modifier = Modifier.fillMaxWidth()) {
-        Text(
-            text = title,
-            style = MaterialTheme.typography.titleMedium,
-            modifier = Modifier.padding(bottom = 8.dp)
-        )
         options.forEach { option ->
             Card(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(vertical = 4.dp)
                     .clickable { onOptionClick(option) },
+                shape = RoundedCornerShape(8.dp),
                 colors = CardDefaults.cardColors(containerColor = Color.White)
             ) {
                 Text(

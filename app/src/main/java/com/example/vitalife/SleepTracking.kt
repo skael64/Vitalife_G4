@@ -19,6 +19,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
+import androidx.navigation.NavController
 import com.github.mikephil.charting.charts.LineChart
 import com.github.mikephil.charting.components.XAxis
 import com.github.mikephil.charting.data.Entry
@@ -28,32 +29,32 @@ import com.github.mikephil.charting.formatter.IndexAxisValueFormatter
 import androidx.navigation.compose.rememberNavController
 
 @Composable
-fun SleepTrackerScreen(onCheckClick: () -> Unit) {
+fun SleepTrackerScreen(navController: NavController) {
     Column(
         modifier = Modifier
             .fillMaxSize()
             .background(Color.White)
             .padding(16.dp)
     ) {
-        TopBar()
+        TopBar({ navController.popBackStack() })
         Spacer(modifier = Modifier.height(24.dp))
         SleepChart()
         Spacer(modifier = Modifier.height(24.dp))
         GradientSleepInfoCard()
         Spacer(modifier = Modifier.height(16.dp))
-        DailySleepScheduleCard(onCheckClick = onCheckClick)  // <- Aquí pasamos el onCheckClick
+        DailySleepScheduleCard(onCheckClick = { navController.navigate("sleepSchedule") })  // <- Aquí pasamos el onCheckClick
         Spacer(modifier = Modifier.height(24.dp))
         TodaySchedule()
     }
 }
 
 @Composable
-fun TopBar() {
+fun TopBar(onClick: () -> Unit) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier.fillMaxWidth()
     ) {
-        IconButton(onClick = {}) {
+        IconButton(onClick = { onClick() } ) {
             Icon(Icons.Default.ArrowBack, contentDescription = "Back")
         }
         Text(
@@ -265,6 +266,7 @@ fun ScheduleItem(
 @Preview(showBackground = true)
 @Composable
 fun VistaPreviaSleepTrackerScreen() {
-    SleepTrackerScreen(onCheckClick = { /* Acción para el click del botón "Check" */ })
+    val navController = rememberNavController()
+    SleepTrackerScreen(navController = navController)
 }
 

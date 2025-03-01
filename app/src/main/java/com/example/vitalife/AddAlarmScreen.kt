@@ -17,16 +17,14 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
 import java.time.LocalTime
 import java.time.format.DateTimeFormatter
 import androidx.navigation.compose.rememberNavController
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AddAlarmScreen(
-    onBackClick: () -> Unit,
-    onAddClick: () -> Unit
-) {
+fun AddAlarmScreen(navController: NavController) {
     var showTimePicker by remember { mutableStateOf(false) }
     var selectedTime by remember { mutableStateOf(LocalTime.of(22, 0)) }
     var showDurationPicker by remember { mutableStateOf(false) }
@@ -45,7 +43,7 @@ fun AddAlarmScreen(
             verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier.fillMaxWidth()
         ) {
-            IconButton(onClick = onBackClick) {
+            IconButton(onClick = { navController.popBackStack() }) {
                 Icon(Icons.Default.ArrowBack, contentDescription = "Back")
             }
             Text(
@@ -207,7 +205,7 @@ fun AddAlarmScreen(
         // Botón Agregar
         Spacer(modifier = Modifier.weight(1f))
         Button(
-            onClick = onAddClick,
+            onClick = {navController.popBackStack()},
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(vertical = 16.dp),
@@ -362,9 +360,7 @@ fun NumberPicker(
 @Preview
 @Composable
 fun VistaPreviaAddAlarmScreen() {
-    AddAlarmScreen(
-        onBackClick = { /* Acción para volver atrás */ },
-        onAddClick = { /* Acción para agregar la alarma */ }
-    )
+    val navController = rememberNavController()
+    AddAlarmScreen(navController = navController)
 }
 

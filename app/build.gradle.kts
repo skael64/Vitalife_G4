@@ -88,4 +88,8 @@ dependencies {
     implementation ("androidx.compose.ui:ui:1.4.0")
     implementation ("androidx.compose.ui:ui-tooling-preview:1.4.0")
 
+    // Google Fonts
+
+    implementation ("androidx.compose.ui:ui-text-google-fonts:1.7.5")
+    implementation("androidx.compose.material:material-icons-extended:1.7.8")
 }

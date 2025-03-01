@@ -74,7 +74,7 @@ fun CronometroScreen(navController: NavController, ejercicio: String) {
         Button(
             onClick = {
                 temporizador?.cancel()
-                navController.navigate("mensajeFinal")
+                navController.navigate("mensaje")
             },
             colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFD32F2F)), // Rojo
             modifier = Modifier.fillMaxWidth(),
