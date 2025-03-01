@@ -1,13 +1,11 @@
-package com.example.vitalife.model
-
 data class RegisterRequest(
     val nombres: String,
     val apellidos: String,
     val email: String,
     val password: String,
-    val fecha_nacimiento: String?, // Puede ser null
-    val peso: Double?,
-    val talla: Double?,
-    val genero: String,  // Nuevo campo
-    val nivel_actividad: String // Nuevo campo
+    val fechaNacimiento: String? = null,
+    val peso: Double? = null,
+    val talla: Double? = null,
+    val genero: String? = null,
+    val nivelActividad: String? = null
 )

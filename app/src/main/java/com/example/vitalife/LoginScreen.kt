@@ -79,7 +79,7 @@ fun LoginScreen(navController: NavController) {
 // 📌 Función para Iniciar Sesión con Retrofit
 fun loginUser(email: String, password: String, navController: NavController, context: Context) {
     val request = LoginRequest(email, password)
-    val call = RetrofitClient.instance.loginUser(request)
+    val call = RetrofitClient.instance.login(request)
 
     call.enqueue(object : Callback<LoginResponse> {
         override fun onResponse(call: Call<LoginResponse>, response: Response<LoginResponse>) {

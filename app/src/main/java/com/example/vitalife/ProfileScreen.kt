@@ -19,7 +19,7 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.vitalife.api.RetrofitClient
 import com.example.vitalife.model.UserProfile
-import com.example.vitalife.model.UserResponse
+import com.example.vitalife.model.UserProfileResponse
 
 import retrofit2.Call
 import retrofit2.Callback
@@ -200,8 +200,8 @@ fun NotificationToggle(title: String, checked: Boolean, onCheckedChange: (Boolea
 fun fetchUserProfile(userId: Int, onResult: (UserProfile?) -> Unit) {
     val call = RetrofitClient.instance.getUserProfile(userId)
 
-    call.enqueue(object : Callback<UserResponse> {
-        override fun onResponse(call: Call<UserResponse>, response: Response<UserResponse>) {
+    call.enqueue(object : Callback<UserProfileResponse> {
+        override fun onResponse(call: Call<UserProfileResponse>, response: Response<UserProfileResponse>) {
             Log.d("ProfileDebug", "Código HTTP: ${response.code()}")
             Log.d("ProfileDebug", "Cuerpo crudo de la respuesta: ${response.body()}")
 
@@ -218,7 +218,7 @@ fun fetchUserProfile(userId: Int, onResult: (UserProfile?) -> Unit) {
             }
         }
 
-        override fun onFailure(call: Call<UserResponse>, t: Throwable) {
+        override fun onFailure(call: Call<UserProfileResponse>, t: Throwable) {
             Log.e("ProfileError", "Error de conexión: ${t.message}")
             onResult(null)
         }

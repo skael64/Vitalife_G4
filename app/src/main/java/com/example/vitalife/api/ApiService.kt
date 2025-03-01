@@ -1,26 +1,20 @@
-package com.example.vitalife.api
-
-import com.example.vitalife.model.*
+import com.example.vitalife.model.LoginRequest
+import com.example.vitalife.model.LoginResponse
+import com.example.vitalife.model.RegisterResponse
+import com.example.vitalife.model.UserProfileResponse
 import retrofit2.Call
-import retrofit2.http.Body
-import retrofit2.http.GET
-import retrofit2.http.Headers
-import retrofit2.http.POST
-import retrofit2.http.Query
+import retrofit2.http.*
 
 interface ApiService {
-    // 📌 Registro de usuario
-    @Headers("Content-Type: application/json")
-    @POST("register.php")
-    fun registerUser(@Body request: RegisterRequest): Call<ApiResponse>
+    // Endpoint para registro
+    @POST("api/auth/register")
+    fun register(@Body request: RegisterRequest): Call<RegisterResponse>
 
-    // 📌 Inicio de sesión
-    @Headers("Content-Type: application/json")
-    @POST("login.php")
-    fun loginUser(@Body request: LoginRequest): Call<LoginResponse>
+    // Endpoint para login
+    @POST("api/auth/login")
+    fun login(@Body request: LoginRequest): Call<LoginResponse>
 
-    // 📌 Obtener perfil del usuario por ID
-    @GET("getUserProfile.php")
-    fun getUserProfile(@Query("userId") userId: Int): Call<UserResponse> // 📌 Ahora usa UserResponse
-
+    // Endpoint para obtener el perfil de usuario
+    @GET("api/user/profile")
+    fun getUserProfile(@Query("userId") userId: Int): Call<UserProfileResponse>
 }

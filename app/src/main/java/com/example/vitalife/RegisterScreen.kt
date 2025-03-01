@@ -1,9 +1,12 @@
 package com.example.vitalife
 
+import RegisterRequest
 import android.widget.Toast
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -19,8 +22,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.vitalife.api.RetrofitClient
-import com.example.vitalife.api.ApiResponse
-import com.example.vitalife.model.RegisterRequest
+import com.example.vitalife.model.RegisterResponse
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -42,7 +44,7 @@ fun RegisterScreen(navController: NavController) {
     val context = LocalContext.current
 
     Column(
-        modifier = Modifier.fillMaxSize().padding(16.dp),
+        modifier = Modifier.fillMaxSize().padding(16.dp).verticalScroll(rememberScrollState()),
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
@@ -177,9 +179,11 @@ fun registerUser(
     fechaNacimiento: String?, peso: String?, talla: String?, genero: String, nivelActividad: String,
     navController: NavController, context: android.content.Context
 ) {
+    // Convertir peso y talla a Double (si son válidos)
     val pesoDouble = peso?.toDoubleOrNull()
     val tallaDouble = talla?.toDoubleOrNull()
 
+    // Formatear la fecha de nacimiento
     val formattedFechaNacimiento = try {
         SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).parse(fechaNacimiento!!)
             ?.let { SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(it) }
@@ -187,25 +191,44 @@ fun registerUser(
         null
     }
 
-    val request = RegisterRequest(nombres, apellidos, email, password, formattedFechaNacimiento, pesoDouble, tallaDouble, genero, nivelActividad)
+    // Crear la solicitud de registro
+    val request = RegisterRequest(
+        nombres = nombres,
+        apellidos = apellidos,
+        email = email,
+        password = password,
+        fechaNacimiento = formattedFechaNacimiento,
+        peso = pesoDouble,
+        talla = tallaDouble,
+        genero = genero,
+        nivelActividad = nivelActividad
+    )
 
-    val call = RetrofitClient.instance.registerUser(request)
+    // Hacer la llamada a la API
+    val call = RetrofitClient.instance.register(request)
 
-    call.enqueue(object : Callback<ApiResponse> {
-        override fun onResponse(call: Call<ApiResponse>, response: Response<ApiResponse>) {
+    call.enqueue(object : Callback<RegisterResponse> { // Cambia ApiResponse por RegisterResponse
+        override fun onResponse(call: Call<RegisterResponse>, response: Response<RegisterResponse>) {
             if (response.isSuccessful) {
-                response.body()?.let {
-                    Toast.makeText(context, it.message, Toast.LENGTH_LONG).show()
-                    if (it.success) {
-                        navController.navigate("profile")
-                    }
+                val registerResponse = response.body()
+                if (registerResponse?.success == true) {
+                    // Registro exitoso
+                    Toast.makeText(context, registerResponse.message, Toast.LENGTH_LONG).show()
+                    // Guardar el userId si es necesario
+                    val userId = registerResponse.userId
+                    navController.navigate("profile") // Navegar a la pantalla de perfil
+                } else {
+                    // Error en el registro
+                    Toast.makeText(context, registerResponse?.message ?: "Error desconocido", Toast.LENGTH_LONG).show()
                 }
             } else {
-                Toast.makeText(context, "Error en el servidor", Toast.LENGTH_LONG).show()
+                // Error en la respuesta del servidor
+                Toast.makeText(context, "Error en el servidor: ${response.errorBody()?.string()}", Toast.LENGTH_LONG).show()
             }
         }
 
-        override fun onFailure(call: Call<ApiResponse>, t: Throwable) {
+        override fun onFailure(call: Call<RegisterResponse>, t: Throwable) {
+            // Error de conexión
             Toast.makeText(context, "Error de conexión: ${t.message}", Toast.LENGTH_LONG).show()
         }
     })
